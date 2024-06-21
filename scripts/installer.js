@@ -1,27 +1,28 @@
-﻿// TODO: Maybe not just copy paste this?
+﻿import fs from "node:fs";
+import path, { join } from "node:path";
+import readline from "node:readline";
+import cp from "node:child_process";
+import asar from "@electron/asar";
+import {fileURLToPath} from "node:url";
 
-const MOD_NAME = "gluonza.js"
-const BUILD_PATH = "build"
+const dirname = path.join(fileURLToPath(import.meta.url), "..");
 
-const fs = require('fs');
-const path = require('path');
-const readline = require('readline');
-const distrustPath = path.resolve(BUILD_PATH, MOD_NAME).replaceAll('\\', '\\\\'); // tickets please :>
+const gluonzaPath = JSON.stringify(path.resolve("build", "index.js")); // tickets please :>
 const args = process.argv.slice(2);
 const version = args[1];
 
 const Logger = {
     green: (message) => {
-        console.log('\x1b[34m[Distrust] \x1b[0m\x1b[32m%s\x1b[0m', message);
+        console.log('\x1b[34m[gluonza] \x1b[0m\x1b[32m%s\x1b[0m', message);
     },
     red: (message) => {
-        console.log('\x1b[34m[Distrust] \x1b[0m\x1b[31m%s\x1b[0m', message);
+        console.log('\x1b[34m[gluonza] \x1b[0m\x1b[31m%s\x1b[0m', message);
     },
     blue: (message) => {
-        console.log('\x1b[34m[Distrust] \x1b[0m\x1b[34m%s\x1b[0m', message);
+        console.log('\x1b[34m[gluonza] \x1b[0m\x1b[34m%s\x1b[0m', message);
     },
     yellow: (message) => {
-        console.log('\x1b[34m[Distrust] \x1b[0m\x1b[33m%s\x1b[0m', message);
+        console.log('\x1b[34m[gluonza] \x1b[0m\x1b[33m%s\x1b[0m', message);
     },
     rainbow: (message) => { // this was literally NOT needed. but I got bored making this.
         const colors = ['\x1b[31m', '\x1b[33m', '\x1b[32m', '\x1b[36m', '\x1b[34m', '\x1b[35m'];
@@ -69,47 +70,9 @@ const getAllUserProfiles = () => {
     return userProfiles;
 };
 
-function moveBuildFiles(selectedPath) {
-    const buildPath = path.join(__dirname, '..', 'build');
-    const preloadSrcPath = path.join(buildPath, 'index.js');
-    const rendererSrcPath = path.join(buildPath, 'preload.js');
-    const preloadDestPath = path.join(selectedPath, 'index.js');
-    const rendererDestPath = path.join(selectedPath, 'preload.js');
-
-    fs.copyFile(preloadSrcPath, preloadDestPath, (oopsie) => {
-        if (oopsie) {
-            Logger.red('Error moving preload.min.js:', oopsie);
-            return;
-        }
-        Logger.green('preload.min.js moved successfully.');
-    });
-
-    fs.copyFile(rendererSrcPath, rendererDestPath, (whoopsie) => {
-        if (whoopsie) {
-            Logger.red('Error moving renderer.min.js:', whoopsie);
-            return;
-        }
-        Logger.green('renderer.min.js moved successfully.');
-    });
-}
-
-const findHighestVersionFolder = (basePath, prefix) => {
-    const folders = fs.readdirSync(basePath).filter(folder => {
-        return folder.startsWith(prefix) && fs.lstatSync(path.join(basePath, folder)).isDirectory();
-    });
-
-    if (folders.length === 0) {
-        return null;
-    }
-
-    folders.sort((a, b) => {
-        const versionA = parseInt(a.replace(prefix, ''));
-        const versionB = parseInt(b.replace(prefix, ''));
-        return versionB - versionA;
-    });
-
-    return folders[0];
-};
+const killDiscord = () => new Promise((r) => {
+    cp.exec(`Get-Process -Name ${baseFolderName} -ea SilentlyContinue | Stop-Process -Force`, { shell: "powershell" }, () => r()).on("error", () => r());
+});
 
 const findDiscordPaths = (profilePath) => {
     const targetPaths = [];
@@ -120,18 +83,13 @@ const findDiscordPaths = (profilePath) => {
             return folder.startsWith('app') && fs.lstatSync(fullPath).isDirectory();
         });
 
-        appFolders.sort().forEach(appFolder => {
-            const modulesPath = path.join(basePath, appFolder, 'modules');
-            if (fs.existsSync(modulesPath)) {
-                const highestVersionFolder = findHighestVersionFolder(modulesPath, 'discord_desktop_core-');
-                if (highestVersionFolder) {
-                    const targetPath = path.join(modulesPath, highestVersionFolder, 'discord_desktop_core');
-                    if (fs.existsSync(targetPath)) {
-                        targetPaths.push(targetPath);
-                    }
-                }
-            }
-        });
+        for (const appFolder of appFolders.sort()) {
+            const appdir = path.join(basePath, appFolder, 'resources');
+
+            if (!fs.existsSync(appdir)) return;
+
+            targetPaths.push(appdir);
+        }
     }
 
     return targetPaths;
@@ -149,34 +107,49 @@ userProfiles.forEach(profilePath => {
     }
 });
 
+const makeGlounzaAsar = async () => {
+    if (!fs.existsSync(join(dirname, "..", "build"))) {
+        Logger.red("You need to compile glounza first!");
+        process.exit(1);
+    }
+    
+    if (fs.existsSync(join(dirname, "..", "app.asar"))) {
+        fs.rmSync(join(dirname, "..", "app.asar"));
+    }
+
+    if (!fs.existsSync(join(dirname, "..", "app"))) fs.mkdirSync(join(dirname, "..", "app"));
+ 
+    await fs.promises.writeFile(join(dirname, "..", "app", "index.js"), `require(${gluonzaPath});\nrequire("../glounza.app.asar");`);
+    await fs.promises.writeFile(join(dirname, "..", "app", "package.json"), JSON.stringify({
+        main: "./index.js"
+    }));
+
+    return asar.createPackage(join(dirname, "..", "app"), join(dirname, "..", "app.asar"));
+}
+
 const selectTargetPath = (selectedPath) => {
-    const indexPath = path.join(selectedPath, 'index.js');
+    const asarPath = path.join(selectedPath, "app.asar");
+    const asarPathOriginal = path.join(selectedPath, "glounza.app.asar");    
 
-    fs.readFile(indexPath, 'utf8', (err, data) => {
-        if (err) {
-            Logger.red('Error reading index.js:', err);
-            rl.close();
-            return;
-        }
+    rl.question(`Are you sure you want to install it to "${selectedPath}"? (yes/no): `, async (confirmation) => {
+        if (confirmation.toLowerCase() === 'yes' || confirmation.toLowerCase() === 'y') {
+            await killDiscord();
 
-        rl.question(`Are you sure you want to install it to "${selectedPath}"? (yes/no): `, (confirmation) => {
-            if (confirmation.toLowerCase() === 'yes' || confirmation.toLowerCase() === 'y') {
-                const modifiedContent = modifyIndexFile();
-                fs.writeFile(indexPath, modifiedContent, (err) => {
-                    if (err) {
-                        Logger.red('Error writing to index.js:', err);
-                        rl.close();
-                        return;
-                    }
-                    Logger.green('index.js modified successfully.');
-                    moveBuildFiles(selectedPath);
-                    rl.close();
-                });
-            } else {
-                Logger.green('Installation cancelled.');
-                rl.close();
+            if (fs.existsSync(asarPathOriginal)) {
+                fs.rmSync(asarPath);
+                fs.copyFileSync(asarPathOriginal, asarPath);
             }
-        });
+
+            await makeGlounzaAsar();
+
+            fs.copyFileSync(asarPath, asarPathOriginal);
+            fs.copyFileSync(join(dirname, "..", "app.asar"), asarPath);
+
+            rl.close();
+        } else {
+            Logger.green('Installation cancelled.');
+            rl.close();
+        }
     });
 };
 
@@ -216,8 +189,4 @@ if (allTargetPaths.length > 1) {
     const selectedPath = allTargetPaths[0].path;
     Logger.green(`Automatically selected target path: ${selectedPath}`);
     selectTargetPath(selectedPath);
-}
-
-function modifyIndexFile() {
-    return `require(\`${distrustPath}\`);\nmodule.exports = require('./core.asar');`;
 }

@@ -1,5 +1,8 @@
 node_modules
 bun.lockb
+# build stuff
 build
+app
+app.asar
 # stupid jetbrains
 .idea

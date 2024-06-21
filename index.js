@@ -1,6 +1,6 @@
 // @ts-check
-const {exec} = require('child_process');
 import esbuild from "esbuild";
+import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 
@@ -8,7 +8,7 @@ const dirname = path.join(fileURLToPath(import.meta.url), "..");
 
 await esbuild.build({
   entryPoints: [ "gluonza/index.tsx" ],
-  outfile: "dist/gluonza.js",
+  outfile: "build/gluonza.js",
   inject: [
     "./injections/jsx.js"
   ],
@@ -86,3 +86,8 @@ await esbuild.build({
 });
 
 console.log("Compiled desktop/overlay");
+
+await writeFile("./build/package.json", JSON.stringify({
+  main: "./index.js",
+  type: "commonjs"
+}))
