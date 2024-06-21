@@ -1,8 +1,8 @@
 // @ts-check
-
+const {exec} = require('child_process');
 import esbuild from "esbuild";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import {fileURLToPath} from "node:url";
 
 const dirname = path.join(fileURLToPath(import.meta.url), "..");
 
@@ -25,7 +25,7 @@ console.log("Compiled gluanza");
 
 await esbuild.build({
   entryPoints: [ "desktop/main/index.ts" ],
-  outfile: "dist/index.js",
+  outfile: "build/index.js",
   inject: [ ],
   plugins: [
     
@@ -41,7 +41,7 @@ console.log("Compiled desktop/main");
 
 await esbuild.build({
   entryPoints: [ "desktop/renderer/index.ts" ],
-  outfile: "dist/preload.js",
+  outfile: "build/preload.js",
   inject: [ ],
   plugins: [
     
@@ -57,7 +57,7 @@ console.log("Compiled desktop/renderer");
 
 await esbuild.build({
   entryPoints: [ "desktop/splash/index.ts" ],
-  outfile: "dist/splash.js",
+  outfile: "build/splash.js",
   inject: [ ],
   plugins: [
     
@@ -73,7 +73,7 @@ console.log("Compiled desktop/splash");
 
 await esbuild.build({
   entryPoints: [ "desktop/overlay/index.ts" ],
-  outfile: "dist/overlay.js",
+  outfile: "build/overlay.js",
   inject: [ ],
   plugins: [
     
