@@ -1,0 +1,1 @@
+// # patch electron BrowserWindow and set up ipc

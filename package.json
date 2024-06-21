@@ -1,0 +1,27 @@
+{
+  "name": "gluonza",
+  "version": "1.0.0",
+  "description": "A discord client mod",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gluonza/Gluonza.git"
+  },
+  "keywords": [
+    "discord",
+    "discord-mod"
+  ],
+  "author": "zrodevkaan & doggybootsy",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/Gluonza/Gluonza/issues"
+  },
+  "homepage": "https://github.com/Gluonza/Gluonza#readme",
+  "dependencies": {
+    "@types/electron": "^1.6.10",
+    "@types/node": "^20.14.7"
+  }
+}
