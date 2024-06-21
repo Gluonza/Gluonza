@@ -7,11 +7,17 @@ import {join} from "path";
 
 const {env} = process;
 
-export default class PatchedBrowserWindow extends BrowserWindow {
+class PatchedBrowserWindow extends BrowserWindow {
     constructor(opts: Electron.BrowserWindowConstructorOptions) {
+        // Make sure to only get the main window
+        if (!opts || !opts.webPreferences || !opts.webPreferences.preload || !opts.webPreferences.preload.includes("main")) {
+          super(opts);
+          return;
+        }
+
         env.DISCORD_PRELOADER = opts.webPreferences!.preload;
 
-        opts.webPreferences!.preload = join(__dirname, "preload.min.js");
+        opts.webPreferences!.preload = join(__dirname, "./preload.js");
 
         return new BrowserWindow(opts);
 

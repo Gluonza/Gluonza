@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext.Intl",
+      "ES2022.Intl"
+    ],
+    "jsx": "react",
+    "experimentalDecorators": true,
+    // Once the react polyfill is added block these 2 lines below
+    "jsxFactory": "__jsx__",
+    "jsxFragmentFactory": "__jsx__.Fragment",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "paths": {
+      // "common": [ "./common" ],
+      // "common/*": [ "./common/*" ]
+    },
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true
+  }
+}
