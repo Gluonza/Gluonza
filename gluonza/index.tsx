@@ -1,6 +1,6 @@
 // # do mod stuff idk
 
-export * from './api/webpack/chunk.ts'
+import {coreLogger} from "../desktop/global/consts.js";
 
 const abc = (
   <>
@@ -9,6 +9,6 @@ const abc = (
   </>
 )
 
-console.log(abc);
+// coreLogger.logRaw(abc);
 
 window.uwu = 'uwu'

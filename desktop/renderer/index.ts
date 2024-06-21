@@ -4,6 +4,7 @@ import {webFrame} from "electron/renderer";
 import {readFileSync} from "fs";
 import path from "path";
 import {waitForElementRemoved, waitForNode} from "common/dom.js";
+import {coreLogger} from "../global/consts.js";
 
 const removalNodeQuery = '[class*="container_"][class*="fixClipping_"]'
 
@@ -11,7 +12,8 @@ function InitMain() {
     const loader = new LoadingScreen();
     document.addEventListener("readystatechange", async () => {
         loader.init();
-        console.log('Loaded INIT')
+        
+        coreLogger.info('Loaded InitMain.')
         const node = await waitForNode(removalNodeQuery);
         await waitForElementRemoved(node);
 
