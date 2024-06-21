@@ -18,6 +18,7 @@
       // "common": [ "./common" ],
       // "common/*": [ "./common/*" ]
     },
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

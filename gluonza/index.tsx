@@ -1,4 +1,7 @@
 // # do mod stuff idk
+
+export * from './api/webpack/chunk.ts'
+
 const abc = (
   <>
     <div>123</div>
@@ -7,3 +10,5 @@ const abc = (
 )
 
 console.log(abc);
+
+window.uwu = 'uwu'

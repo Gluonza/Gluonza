@@ -100,7 +100,7 @@ const allTargetPaths = [];
 
 userProfiles.forEach(profilePath => {
     const discordPaths = findDiscordPaths(profilePath);
-    if (discordPaths.length > 0) {
+    if (discordPaths?.length > 0) {
         discordPaths.forEach(targetPath => {
             allTargetPaths.push({userProfile: profilePath, path: targetPath});
         });
