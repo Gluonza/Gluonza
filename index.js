@@ -39,7 +39,6 @@ await esbuild.build({
 
 console.log("Compiled desktop/main");
 
-
 await esbuild.build({
   entryPoints: [ "desktop/renderer/index.ts" ],
   outfile: "dist/preload.js",
@@ -56,3 +55,34 @@ await esbuild.build({
 
 console.log("Compiled desktop/renderer");
 
+await esbuild.build({
+  entryPoints: [ "desktop/splash/index.ts" ],
+  outfile: "dist/splash.js",
+  inject: [ ],
+  plugins: [
+    
+  ],
+  external: [ "electron", "original-fs" ],
+  bundle: true,
+  platform: "node",
+  tsconfig: path.join(dirname, "tsconfig.json"),
+  jsx: "transform"
+});
+
+console.log("Compiled desktop/splash");
+
+await esbuild.build({
+  entryPoints: [ "desktop/overlay/index.ts" ],
+  outfile: "dist/overlay.js",
+  inject: [ ],
+  plugins: [
+    
+  ],
+  external: [ "electron", "original-fs" ],
+  bundle: true,
+  platform: "node",
+  tsconfig: path.join(dirname, "tsconfig.json"),
+  jsx: "transform"
+});
+
+console.log("Compiled desktop/overlay");

@@ -10,14 +10,28 @@ const {env} = process;
 class PatchedBrowserWindow extends BrowserWindow {
     constructor(opts: Electron.BrowserWindowConstructorOptions) {
         // Make sure to only get the main window
-        if (!opts || !opts.webPreferences || !opts.webPreferences.preload || !opts.webPreferences.preload.includes("main")) {
+        if (!opts || !opts.webPreferences || !opts.webPreferences.preload) {
           super(opts);
           return;
         }
 
-        env.DISCORD_PRELOADER = opts.webPreferences!.preload;
+        if (opts.webPreferences.preload.includes("main")) {
+            env.DISCORD_PRELOADER = opts.webPreferences!.preload;
 
-        opts.webPreferences!.preload = join(__dirname, "./preload.js");
+            opts.webPreferences!.preload = join(__dirname, "./preload.js");
+        }
+        else if (opts.webPreferences.preload.includes("splash")) {
+            env.DISCORD_PRELOADER_SPLASH = opts.webPreferences!.preload;
+
+            opts.webPreferences!.preload = join(__dirname, "./splash.js");
+        }// no idea if this works
+        else if (opts.webPreferences.preload.includes("overlay")) {
+            env.DISCORD_PRELOADER_OVERLAY = opts.webPreferences!.preload;
+
+            opts.webPreferences!.preload = join(__dirname, "./overlay.js");
+        }
+        // If this isnt any of those 3 just stop
+        else super(opts);
 
         return new BrowserWindow(opts);
 
