@@ -1,5 +1,5 @@
 node_modules
 bun.lockb
-dist
+build
 # stupid jetbrains
 .idea
