@@ -3,7 +3,7 @@ import {LoadingScreen} from "./components/Loading.js";
 import {webFrame} from "electron/renderer";
 import {readFileSync} from "fs";
 import path from "path";
-import {waitForElementRemoved, waitForNode} from "../common/dom.js";
+import {waitForElementRemoved, waitForNode} from "common/dom.js";
 
 const removalNodeQuery = '[class*="container_"][class*="fixClipping_"]'
 

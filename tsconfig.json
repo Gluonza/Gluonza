@@ -5,7 +5,8 @@
       "DOM",
       "DOM.Iterable",
       "ESNext.Intl",
-      "ES2022.Intl"
+      "ES2022.Intl",
+      "ES2022.Object"
     ],
     "jsx": "react",
     "experimentalDecorators": true,
@@ -15,10 +16,11 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "paths": {
-      // "common": [ "./common" ],
-      // "common/*": [ "./common/*" ]
+      "common": [ "./common" ],
+      "common/*": [ "./common/*" ],
+      "typings": [ "./typings" ],
+      "typings/*": [ "./typings/*" ],
     },
-    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

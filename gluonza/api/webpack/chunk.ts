@@ -1,5 +1,5 @@
 ﻿
-import {__webpack_require__ as WebpackInstance} from "../../../typings/index.js";
+import {__webpack_require__ as WebpackInstance} from "typings/index.js";
 
 export interface WebpackModule extends Omit<Parameters<WebpackInstance['m']>[0], 'id'>
 {
