@@ -2,6 +2,9 @@
 
 import esbuild from "esbuild";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const dirname = path.join(fileURLToPath(import.meta.url), "..");
 
 await esbuild.build({
   entryPoints: [ "gluonza/index.tsx" ],
@@ -14,7 +17,7 @@ await esbuild.build({
   ],
   bundle: true,
   platform: "browser",
-  tsconfig: path.join(__dirname, "tsconfig.json"),
+  tsconfig: path.join(dirname, "tsconfig.json"),
   jsx: "transform"
 });
 
@@ -30,7 +33,7 @@ await esbuild.build({
   external: [ "electron", "original-fs" ],
   bundle: true,
   platform: "node",
-  tsconfig: path.join(__dirname, "tsconfig.json"),
+  tsconfig: path.join(dirname, "tsconfig.json"),
   jsx: "transform"
 });
 
@@ -47,7 +50,7 @@ await esbuild.build({
   external: [ "electron", "original-fs" ],
   bundle: true,
   platform: "node",
-  tsconfig: path.join(__dirname, "tsconfig.json"),
+  tsconfig: path.join(dirname, "tsconfig.json"),
   jsx: "transform"
 });
 
