@@ -6,6 +6,8 @@ import path from "path";
 import {waitForElementRemoved, waitForNode} from "common/dom.js";
 import {coreLogger} from "common/consts";
 
+import "./native";
+
 const removalNodeQuery = '[class*="container_"][class*="fixClipping_"]'
 
 function InitMain() {

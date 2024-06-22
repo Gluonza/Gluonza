@@ -51,7 +51,8 @@ type GluanzaGlobal = typeof import("../gluonza/window")["gluanza"];
 
 interface DiscordWindow {
   webpackChunkdiscord_app?: Webpack.AppObject,
-  gluanza: GluanzaGlobal,
+  gluanza: typeof import("../gluonza/window")["gluanza"],
+  gluanzaNative: typeof import("../desktop/renderer/native")["gluanzaNative"],
   // DiscordNative?: DiscordNative
 }
 
