@@ -1,12 +1,24 @@
 import { shouldSearchDefault, shouldSkipModule, wrapFilter } from "./shared";
 import { webpackRequire } from ".";
 
-export function getModule<T extends Object>(filter: Webpack.Filter, opts: Webpack.FilterOptions = {}): T | void {
-  filter = wrapFilter(filter);
-  if (!webpackRequire) return;
+export function getModule<T extends R extends true ? any : Object, R extends boolean = false, E = R extends true ? Webpack.Module<T> : T, F = R extends true ? Webpack.RawFilter : Webpack.Filter>($filter: F, opts: Webpack.FilterOptions<R> = {}): E | void {
+  const { searchDefault = true, searchExports = false, raw = false } = opts;
   
-  const { searchDefault = true, searchExports = false } = opts;
+  if (!webpackRequire) return;
 
+  if (raw) {
+    const filter = $filter as Webpack.RawFilter;
+    for (const id in webpackRequire.c) {
+      if (Object.prototype.hasOwnProperty.call(webpackRequire.c, id)) {
+        const module = webpackRequire.c[id];
+        
+        if (filter.call(module, module, id)) return module as E;
+      }
+    }
+    return;
+  }
+
+  const filter = wrapFilter($filter as Webpack.Filter);
   for (const id in webpackRequire.c) {
     if (Object.prototype.hasOwnProperty.call(webpackRequire.c, id)) {
       const module = webpackRequire.c[id];
@@ -18,7 +30,7 @@ export function getModule<T extends Object>(filter: Webpack.Filter, opts: Webpac
       else if (searchDefault && shouldSearchDefault(module)) keys.push("default");
       
       if (filter.call(module, module.exports, module, module.id)) {
-        return module.exports as T;
+        return module.exports as E;
       }
 
       for (const key of keys) {
@@ -28,12 +40,13 @@ export function getModule<T extends Object>(filter: Webpack.Filter, opts: Webpac
         if (!(exported instanceof Object)) continue;
 
         if (filter.call(module, exported, module, module.id)) {
-          return exported as T;
+          return exported as E;
         }
       }
     }
   }
 }
+
 export function getAllModules(filter: Webpack.Filter, opts: Webpack.FilterOptions = {}) {
   const modules: any[] = [];
 

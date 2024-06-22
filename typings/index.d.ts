@@ -20,15 +20,20 @@ declare module Webpack {
   
   type Filter = (this: Module, exported: any, module: Module, id: PropertyKey) => any;
   type ExportedOnlyFilter = (exported: any) => any;
-  type FilterOptions = {
+  type RawFilter = (this: Module, module: Module, id: PropertyKey) => any;
+
+  type FilterOptions<T extends boolean = false> = {
     searchExports?: boolean,
-    searchDefault?: boolean
+    searchDefault?: boolean,
+    raw?: T
   };
-  type BulkFilter = FilterOptions & {
+  type BulkFilter = {
+    searchExports?: boolean,
+    searchDefault?: boolean,
     filter: Filter
   };
   type SignalOption = { signal?: AbortSignal };
-  type LazyFilterOptions = FilterOptions & SignalOption;
+  type LazyFilterOptions<T extends boolean = false> = FilterOptions<T> & SignalOption;
 
   type ModuleWithEffect = [
     Array<any>,
