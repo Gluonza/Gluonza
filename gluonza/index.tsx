@@ -1,14 +1,5 @@
 // # do mod stuff idk
 
-import {coreLogger} from "../desktop/global/consts.js";
+import { gluanza } from "./window";
 
-const abc = (
-  <>
-    <div>123</div>
-    <div>abc</div>
-  </>
-)
-
-// coreLogger.logRaw(abc);
-
-window.uwu = 'uwu'
+window.gluanza = gluanza;

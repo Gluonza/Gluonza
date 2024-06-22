@@ -4,7 +4,7 @@ import {webFrame} from "electron/renderer";
 import {readFileSync} from "fs";
 import path from "path";
 import {waitForElementRemoved, waitForNode} from "common/dom.js";
-import {coreLogger} from "../global/consts.js";
+import {coreLogger} from "common/consts";
 
 const removalNodeQuery = '[class*="container_"][class*="fixClipping_"]'
 

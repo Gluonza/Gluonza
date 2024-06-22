@@ -5,21 +5,19 @@
       "DOM",
       "DOM.Iterable",
       "ESNext.Intl",
-      "ES2022.Intl",
-      "ES2022.Object"
+      "ES2022.Intl"
     ],
     "jsx": "react",
     "experimentalDecorators": true,
-    // Once the react polyfill is added block these 2 lines below
-    "jsxFactory": "__jsx__",
+    "jsxFactory": "__jsx__.createElement",
     "jsxFragmentFactory": "__jsx__.Fragment",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Node10",
     "paths": {
-      "common": [ "./common" ],
-      "common/*": [ "./common/*" ],
-      "typings": [ "./typings" ],
-      "typings/*": [ "./typings/*" ],
+      "common": ["./common"],
+      "common/*": ["./common/*"],
+      "typings": ["./typings"],
+      "typings/*": ["./typings/*"]
     },
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
@@ -27,6 +25,8 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitAny": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    "typeRoots": ["./node_modules/@types", "./typings/index.d.ts"]
   }
 }

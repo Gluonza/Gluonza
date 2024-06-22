@@ -3,57 +3,54 @@ declare const __jsx__ = Object.assign(React["createElement"], {
   Fragment: React["Fragment"]
 });
 
-export interface __webpack_require__ {
-  (id: number): any;
-  E: Function;
-  F: { j: Function; };
-  O: Function & { j: Function; };
-  a: Function;
-  amdD: Function;
-  amdO: unknown;
-  b: string;
-  /**
-   * This is where loaded modules are stored; and where webpack searchers do their searching.
-   */
-  c: {
-    [id: number]: {
-      id: number | string;
-      loaded: boolean;
-      exports: any;
-    };
+declare module Webpack {
+  interface Require extends Function {
+    <T = any>(id: PropertyKey): T;
+    d(target, exports): void;
+    c: Record<PropertyKey, Module>;
+    m: Record<PropertyKey, RawModule>;
+    e(id: PropertyKey): Promise<unknown>;
   };
-  d: Function;
-  /**
-   * Loads chunks by their ID.
-   */
-  e: (chunkId: number) => any;
-  f: {
-    compat: Function;
-    j: Function;
-    prefetch: Function;
+  interface Module<T extends any = any> {
+    id: PropertyKey,
+    exports: T,
+    loaded: boolean
   };
-  g: typeof globalThis & { [key: string]: any; };
-  hmd: Function;
-  l: Function;
-  /**
-   * This houses all modules that have been pushed, loaded or not.
-   *
-   * This can be useful for force lazy-loading classes and other modules that haven't been instantiated yet but have been pushed.
-   *
-   * @param ret The return value from the module will be `Object.assign`ed to this object.
-   */
-  m: (e: {
-    exports: any,
-    id: number,
-    loaded: boolean;
-  }, ret: object, req: __webpack_require__) => void;
-  n: Function;
-  nmd: Function;
-  o: Function;
-  p: string;
-  r: Function;
-  s: number;
-  t: Function;
-  u: Function;
-  v: Function;
+  type RawModule = (module: Module, exports: object, require: Require) => void;
+  
+  type Filter = (this: Module, exported: any, module: Module, id: PropertyKey) => any;
+  type ExportedOnlyFilter = (exported: any) => any;
+  type FilterOptions = {
+    searchExports?: boolean,
+    searchDefault?: boolean
+  };
+  type BulkFilter = FilterOptions & {
+    filter: Filter
+  };
+  type SignalOption = { signal?: AbortSignal };
+  type LazyFilterOptions = FilterOptions & SignalOption;
+
+  type ModuleWithEffect = [
+    Array<any>,
+    Record<PropertyKey, RawModule>,
+    (require: Require) => void
+  ];
+  type ModuleWithoutEffect = [
+    Array<any>,
+    Record<PropertyKey, RawModule>
+  ];
+  type AppObject = Array<ModuleWithoutEffect | ModuleWithEffect>;
+};
+
+type GluanzaGlobal = typeof import("../gluonza/window")["gluanza"];
+
+interface DiscordWindow {
+  webpackChunkdiscord_app?: Webpack.AppObject,
+  gluanza: GluanzaGlobal,
+  // DiscordNative?: DiscordNative
 }
+
+declare global {
+  interface Window extends DiscordWindow {};
+}
+interface Window extends DiscordWindow {};
