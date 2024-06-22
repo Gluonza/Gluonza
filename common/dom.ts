@@ -100,3 +100,23 @@ export function createStyle(id: string, css: string = "") {
         }
     }
 }
+
+export function injectCSS(id: string, css: string | null) {
+    let existingStyle = document.getElementById(id);
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = css;
+
+    document.head.appendChild(style);
+}
+
+export function uninjectCSS(id: string) {
+    let existingStyle = document.getElementById(id);
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+}

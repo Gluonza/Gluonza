@@ -1,4 +1,6 @@
-﻿export class LoadingScreen {
+﻿import {injectCSS} from "common/dom.js";
+
+export class LoadingScreen {
     private loadingScreen: HTMLDivElement | undefined;
     private alreadyLoaded: boolean = false;
 
@@ -8,6 +10,7 @@
         "Taking a nap, please wait.",
         "Grabbing coffee... I mean data.",
         "Do not panic, we're professionals.",
+        "Do not panic, we don't got your token",
         "Loading... because patience is a virtue.",
         "Your wait time is directly proportional to our coffee breaks.",
         "Loading... If only it was as fast as you wanted.",
@@ -18,14 +21,15 @@
         "Loading... because instant gratification is so last century.",
         "Patience you must have, my young padawan.",
         "Our servers are in a yoga class, stretching it out.",
-        "These quotes mean actually nothing. What means to us is you using Gluonza <3"
+        "These quotes mean actually nothing. What means to us is you using Gluonza <3",
+        "5T3AL!NG Y0UR T0K3N"
     ];
 
     init() {
         if (this.alreadyLoaded) return;
         this.alreadyLoaded = true;
 
-        this.injectCSS('custom-styles', this.customCSS);
+        injectCSS('custom-styles', this.customCSS);
 
         this.loadingScreen = document.createElement('div');
         this.loadingScreen.classList.add('loading-screen');
@@ -225,17 +229,4 @@
         }
       }
     `;
-
-    injectCSS(id: string, css: string | null) {
-        let existingStyle = document.getElementById(id);
-        if (existingStyle) {
-            existingStyle.remove();
-        }
-
-        const style = document.createElement('style');
-        style.id = id;
-        style.textContent = css;
-
-        document.head.appendChild(style);
-    }
 }

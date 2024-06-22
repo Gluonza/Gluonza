@@ -8,13 +8,20 @@ import {coreLogger} from "common/consts";
 
 import "./native";
 
-const removalNodeQuery = '[class*="container_"][class*="fixClipping_"]'
+export const removalNodeQuery = '[class*="container_"][class*="fixClipping_"]'
 
 function InitMain() {
     const loader = new LoadingScreen();
     document.addEventListener("readystatechange", async () => {
-        loader.init();
-        
+
+        /* Discord. 1. Why do you share the same preload for overlays. */
+        /* 2. WHY DO YOU SHARE THE SAME PRELOAD FOR OVERLAYS */
+        /* If you couldn't tell, this is so splash screen doesn't load in overlays */
+
+        const isOverlayContext = typeof window !== 'undefined' && window != null && window.__OVERLAY__ || document.getElementById('__OVERLAY__SENTINEL__') != null || /overlay/.test(window.location.pathname);
+        if (isOverlayContext) return
+
+        loader.init()
         coreLogger.info('Loaded InitMain.')
         const node = await waitForNode(removalNodeQuery);
         await waitForElementRemoved(node);
