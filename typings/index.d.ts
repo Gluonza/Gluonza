@@ -57,6 +57,19 @@ interface DiscordWindow {
 }
 
 declare global {
-  interface Window extends DiscordWindow {};
+  interface Window extends DiscordWindow {}
 }
-interface Window extends DiscordWindow {};
+interface Window extends DiscordWindow {}
+
+interface Patch {
+  identifier: string;
+  find: RegExp;
+  replace: string;
+}
+
+interface Plugin
+{
+  start: Function
+  stop: Function
+  patches:? []
+}

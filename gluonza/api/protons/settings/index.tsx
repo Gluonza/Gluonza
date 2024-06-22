@@ -4,6 +4,7 @@ import {injectCSS} from "common/dom.js";
 import {dashboardStyles, Sidebar} from "./Dashboard.js";
 
 export function start() {
+    console.log("Starting settings.index.tsx.");
 }
 
 export function stop() {

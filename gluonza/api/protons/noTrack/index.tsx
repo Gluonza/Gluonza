@@ -1,4 +1,5 @@
 ﻿export function start() {
+    console.log("Starting noTrack.");
 }
 
 export function stop() {
