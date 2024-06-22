@@ -55,7 +55,7 @@ export function proxyCache<T extends object>(factory: () => T, typeofIsObject: b
     if (key === "get") {
       handlers.get = (target, prop, r) => {
         if (prop === "prototype") return (cacheFactory() as any).prototype ?? Function.prototype;
-        if (prop === Symbol.for("gluanza.proxy.cache")) return cFactory;
+        if (prop === Symbol.for("gluonza.proxy.cache")) return cFactory;
         return Reflect.get(cacheFactory(), prop, r);
       }
       continue;
@@ -77,7 +77,7 @@ export function proxyCache<T extends object>(factory: () => T, typeofIsObject: b
   }
 
   const proxy = new Proxy(Object.assign(typeofIsObject ? {} : function() {}, {
-    [Symbol.for("gluanza.proxy.cache")]: cFactory
+    [Symbol.for("gluonza.proxy.cache")]: cFactory
   }) as T, handlers);
 
   return proxy;

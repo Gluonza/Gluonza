@@ -21,7 +21,7 @@ await esbuild.build({
   jsx: "transform"
 });
 
-console.log("Compiled gluanza");
+console.log("Compiled gluonza");
 
 await esbuild.build({
   entryPoints: [ "desktop/main/index.ts" ],

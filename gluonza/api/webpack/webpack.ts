@@ -14,7 +14,7 @@ export function whenWebpackInit() {
 startMainPatches();
 
 webpackAppChunk.push([
-  [ Symbol.for("gluanza") ],
+  [ Symbol.for("gluonza") ],
   { },
   (wpr) => {
     // Sentry's wpr doesn't have a lot of things
@@ -83,10 +83,10 @@ function set(modules: Record<PropertyKey, Webpack.RawModule>, key: PropertyKey, 
       
       if (typeof replace.replace === "string") {
         let replacer = replace.replace
-          .replace(/\$react/g, "globalThis.gluanza.React")
-          .replace(/\$jsx/g, "globalThis.gluanza.jsx")
-          .replace(/\$fragment/g, "globalThis.gluanza.jsx.Fragment")
-          .replace(/\$gluanza/g, "globalThis.gluanza");
+          .replace(/\$react/g, "globalThis.gluonza.React")
+          .replace(/\$jsx/g, "globalThis.gluonza.jsx")
+          .replace(/\$fragment/g, "globalThis.gluonza.jsx.Fragment")
+          .replace(/\$gluonza/g, "globalThis.gluonza");
 
         if (patch._self) {
           for (const key in patch._self) {
@@ -109,23 +109,23 @@ function set(modules: Record<PropertyKey, Webpack.RawModule>, key: PropertyKey, 
   const path = isNaN(nid) ? `nan/${id}.js` : `${Math.floor(nid / 1_000)}/${id}.js`;
 
   if (orignal === stringedModule) {
-    const moduleFN = compileFunction<(__WEBPACK_MODULE__: Webpack.RawModule) => Webpack.RawModule & { __gluanzaOriginal: Webpack.RawModule }>(`/*\n Module Id: ${id} (unpatched)\n*/\nreturn function() {\n\t__WEBPACK_MODULE__.apply(this, arguments);\n\tgluanza.webpack.__raw._onWebpackModule.apply(this, arguments);};\n\n//# sourceURL=gluanza://gluanza/webpack-modules/unpatched/${path}`, [ "__WEBPACK_MODULE__" ]);
+    const moduleFN = compileFunction<(__WEBPACK_MODULE__: Webpack.RawModule) => Webpack.RawModule & { __gluonzaOriginal: Webpack.RawModule }>(`/*\n Module Id: ${id} (unpatched)\n*/\nreturn function() {\n\t__WEBPACK_MODULE__.apply(this, arguments);\n\tgluonza.webpack.__raw._onWebpackModule.apply(this, arguments);};\n\n//# sourceURL=gluonza://gluonza/webpack-modules/unpatched/${path}`, [ "__WEBPACK_MODULE__" ]);
     
     const webpackModule = moduleFN(module);
 
     webpackModule.toString = () => module.toString();
-    webpackModule.__gluanzaOriginal = module;
+    webpackModule.__gluonzaOriginal = module;
 
     modules[key] = webpackModule;
     return true;
   }
   
-  stringedModule = `(()=>\n/*\n Module Id: ${id}${identifiers.size ? `\n Known string match identifiers '${Array.from(identifiers).join("', '")}'\n This doesn't mean they actually patched anything, just means they matched to it` : ""}\n*/\nfunction(){\n\t(${stringedModule}).apply(this, arguments);\n\tgluanza.webpack.__raw._onWebpackModule.apply(this, arguments);\n})()\n//# sourceURL=gluanza://gluanza/webpack-modules/patched/${path}`;
+  stringedModule = `(()=>\n/*\n Module Id: ${id}${identifiers.size ? `\n Known string match identifiers '${Array.from(identifiers).join("', '")}'\n This doesn't mean they actually patched anything, just means they matched to it` : ""}\n*/\nfunction(){\n\t(${stringedModule}).apply(this, arguments);\n\tgluonza.webpack.__raw._onWebpackModule.apply(this, arguments);\n})()\n//# sourceURL=gluonza://gluonza/webpack-modules/patched/${path}`;
 
   const error = isInvalidSyntax(stringedModule);
   if (error) {
     // Use logger at some point
-    console.warn("[gluanza~Webpack]", `Syntax Error on module '${id}' reverting to original module`, {
+    console.warn("[gluonza~Webpack]", `Syntax Error on module '${id}' reverting to original module`, {
       code: stringedModule,
       identifiers: identifiers,
       error
@@ -140,7 +140,7 @@ function set(modules: Record<PropertyKey, Webpack.RawModule>, key: PropertyKey, 
   }
   else {
     const moduleFN = (0, eval)(stringedModule);
-    moduleFN.__gluanzaOriginal = module;
+    moduleFN.__gluonzaOriginal = module;
   
     modules[key] = moduleFN;
   }

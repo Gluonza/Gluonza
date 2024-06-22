@@ -2,27 +2,27 @@ import fs from "node:fs";
 import path from "node:path";
 import { ipcRenderer, contextBridge } from "electron";
 
-const getPath = (path: Parameters<Electron.App["getPath"]>[0]) => ipcRenderer.sendSync("@gluanza/get-path", path) as string;
+const getPath = (path: Parameters<Electron.App["getPath"]>[0]) => ipcRenderer.sendSync("@gluonza/get-path", path) as string;
 
 const release = ipcRenderer.sendSync("DISCORD_APP_GET_RELEASE_CHANNEL_SYNC") as string;
 
 const appdata = getPath("appData");
 
 const directories = {
-  settings: path.join(appdata, "gluanza", "settings", release),
-  plugins: path.join(appdata, "gluanza", "plugins"),
-  themes: path.join(appdata, "gluanza", "themes")
+  settings: path.join(appdata, "gluonza", "settings", release),
+  plugins: path.join(appdata, "gluonza", "plugins"),
+  themes: path.join(appdata, "gluonza", "themes")
 }
 
-export const gluanzaNative = {
+export const gluonzaNative = {
   app: {
     platform: process.platform,
     release,
     quit() {
-      ipcRenderer.invoke("@gluanza/quit");
+      ipcRenderer.invoke("@gluonza/quit");
     },
     restart() {
-      ipcRenderer.invoke("@gluanza/restart");
+      ipcRenderer.invoke("@gluonza/restart");
     }
   },
   storage: {
@@ -39,7 +39,7 @@ export const gluanzaNative = {
   }
 }
 
-if (process.contextIsolated) contextBridge.exposeInMainWorld("gluanzaNative", gluanzaNative);
-Object.defineProperty(window, "gluanzaNative", {
-  value: gluanzaNative
+if (process.contextIsolated) contextBridge.exposeInMainWorld("gluonzaNative", gluonzaNative);
+Object.defineProperty(window, "gluonzaNative", {
+  value: gluonzaNative
 });

@@ -44,30 +44,30 @@ export const plainTextPatches: PlainTextPatch[] = [];
 addPlainTextPatch(
   // Remove the hash thats appended to react element keys, ex 'Element.__reactFiber$'
   {
-    identifier: "gluanza(no-react-reconciler-hash)",
+    identifier: "gluonza(no-react-reconciler-hash)",
     match: "__reactFiber$",
     find: /(var (.{1,3}))=Math.random\(\).toString\(36\).slice\(2\)/,
     replace: "$1=''"
   }, 
   // Removes the 'HOLD UP' logs in console and prevents token hiding
   {
-    identifier: "gluanza(no-hold-up)",
+    identifier: "gluonza(no-hold-up)",
     match: ".window.setDevtoolsCallbacks",
     find: /^function\(.{1,3},(.{1,3}),(.{1,3})\){"use strict";\2\.d\(\1,{(.{1,3}|UserDefenses):function\(\){return .{1,3}}.+/,
     replace: "function(module,$1,$2){$2.d($1,{$3(){return ()=>{}}})}"
   },
   // Prevents localStorage and sessionStorage from getting deleted
   ...[ "localStorage", "sessionStorage" ].map((type) => ({
-    identifier: `gluanza(save-${type})`,
+    identifier: `gluonza(save-${type})`,
     find: `delete window.${type}`,
     replace: ""
   })),
   // For webpack getLazy
   {
-    identifier: "gluanza(lazy-store)",
+    identifier: "gluonza(lazy-store)",
     match: "Store.waitFor(...)",
     find: /,.{1,3}\.push\(this\),/,
-    replace: "$&gluanza.webpack.__raw._lazyStore(this),"
+    replace: "$&gluonza.webpack.__raw._lazyStore(this),"
   }
 );
 

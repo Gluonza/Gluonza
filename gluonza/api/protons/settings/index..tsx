@@ -25,7 +25,7 @@ export const [getState, setState, useState] = (function () {
     }
 
     function useState() {
-        return window.gluanza.React.useSyncExternalStore((listener) => {
+        return window.gluonza.React.useSyncExternalStore((listener) => {
             listeners.add(listener);
             return () => void listeners.delete(listener);
         }, () => state);
@@ -58,13 +58,13 @@ export function OpenSettingsButton() {
 
 export const patches = [
     {
-        identifier: "gluanza(dashboard)",
+        identifier: "gluonza(dashboard)",
         find: "this.renderLayers()",
-        replace: "[this.renderLayers(),$jsx($gluanza._self.Dashboard)]"
+        replace: "[this.renderLayers(),$jsx($gluonza._self.Dashboard)]"
     },
     {
-        identifier: "gluanza(home-button)",
+        identifier: "gluonza(home-button)",
         match: ".Messages.GUILDS_BAR_A11Y_LABEL",
         find: /\.tree,children:\[/,
-        replace: `.tree,children:[$jsx($gluanza._self.OpenSettingsButton),`
+        replace: `.tree,children:[$jsx($gluonza._self.OpenSettingsButton),`
     }];

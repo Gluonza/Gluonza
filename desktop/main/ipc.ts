@@ -1,13 +1,13 @@
 import { app, ipcMain } from "electron";
 import path from "node:path";
 
-ipcMain.on("@gluanza/get-path", (event, path) => {
+ipcMain.on("@gluonza/get-path", (event, path) => {
   event.returnValue = app.getPath(path);
 });
-ipcMain.handle("@gluanza/quit", () => {
+ipcMain.handle("@gluonza/quit", () => {
   app.quit();
 });
-ipcMain.handle("@gluanza/restart", () => {
+ipcMain.handle("@gluonza/restart", () => {
   app.quit();
   app.relaunch();
 });

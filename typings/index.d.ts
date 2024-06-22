@@ -47,12 +47,12 @@ declare module Webpack {
   type AppObject = Array<ModuleWithoutEffect | ModuleWithEffect>;
 };
 
-type GluanzaGlobal = typeof import("../gluonza/window")["gluanza"];
+type gluonzaGlobal = typeof import("../gluonza/window")["gluonza"];
 
 interface DiscordWindow {
   webpackChunkdiscord_app?: Webpack.AppObject,
-  gluanza: typeof import("../gluonza/window")["gluanza"],
-  gluanzaNative: typeof import("../desktop/renderer/native")["gluanzaNative"],
+  gluonza: typeof import("../gluonza/window")["gluonza"],
+  gluonzaNative: typeof import("../desktop/renderer/native")["gluonzaNative"],
   // DiscordNative?: DiscordNative
 }
 

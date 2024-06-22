@@ -1,5 +1,5 @@
 // # do mod stuff idk
 
-import { gluanza } from "./window";
+import { gluonza } from "./window";
 
-window.gluanza = gluanza;
+window.gluonza = gluonza;

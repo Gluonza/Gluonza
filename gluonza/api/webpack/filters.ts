@@ -31,14 +31,14 @@ export function not(filter: Webpack.Filter): Webpack.Filter {
   };
 }
 
-const hook = Symbol.for("gluanza.patcher.hook");
+const hook = Symbol.for("gluonza.patcher.hook");
 export function byStrings(...strings: string[]): Webpack.ExportedOnlyFilter {
   return (exports) => {
     if (!(exports instanceof Function)) return;
 
     // Check for patch
     let originalFunction = hook in exports ? exports[hook].original : exports;
-    if ("__gluanzaOriginal" in originalFunction) originalFunction = originalFunction.__gluanzaOriginal;
+    if ("__gluonzaOriginal" in originalFunction) originalFunction = originalFunction.__gluonzaOriginal;
 
     try {
       const stringed = Function.prototype.toString.call(originalFunction);
