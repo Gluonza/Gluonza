@@ -8,7 +8,7 @@ import {join} from "path";
 const {env} = process;
 
 class PatchedBrowserWindow extends BrowserWindow {
-    constructor(opts: Electron.BrowserWindowConstructorOptions) {
+    constructor(opts: Electron.BrowserWindowConstructorOptions) {        
         // Make sure to only get the main window
         if (!opts || !opts.webPreferences || !opts.webPreferences.preload) {
             super(opts);

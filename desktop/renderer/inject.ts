@@ -78,7 +78,5 @@ function InitRenderer() {
     }
 }
 
-require(process.env.DISCORD_PRELOADER!);
-
 InitMain();
 InitRenderer();

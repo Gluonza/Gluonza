@@ -56,7 +56,11 @@ interface DiscordWindow {
   // DiscordNative?: DiscordNative
 }
 
-// Typing is kinda wrong, only exists in the preloads / main
+/**
+ * @description This is a alias to the original node require function. 
+ * Esbuild will ignore this require
+ * @note This type is wrong, __node_require__ does not always exist
+ */
 declare const __node_require__: NodeJS.Require;
 
 declare global {
