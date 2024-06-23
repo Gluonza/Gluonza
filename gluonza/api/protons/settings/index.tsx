@@ -1,7 +1,7 @@
 ﻿import {byStrings, getModule} from "../../webpack/index.js";
 import {proxyCache} from "../../../util.js";
 import {injectCSS} from "common/dom.js";
-import {dashboardStyles, Sidebar} from "./Dashboard.js";
+import {DashboardStyle, MainDashboard} from "./comps/Dashboard.js";
 
 export function start() {
     console.log("Starting settings.index.tsx.");
@@ -46,10 +46,10 @@ export function Dashboard() {
     const isOpen = useState();
     if (!isOpen) return null;
 
-    return <Sidebar/>
+    return <MainDashboard onClose={() => {setState(!getState())}}/>
 }
 
-injectCSS('settings', dashboardStyles)
+injectCSS('settings', DashboardStyle)
 
 export function OpenSettingsButton() {
     return <ListItem tooltip={'Glounza Menu'} onClick={() => {

@@ -1,8 +1,8 @@
 ﻿{
-  "id": "owo.kaan.settings",
-  "name": "Settings",
+  "id": "owo.kaan.noTrack",
+  "name": "noTrack",
   "authors": [
     "kaan"
   ],
-  "description": "Adds settings stuff"
+  "description": "yes?"
 }
