@@ -11,7 +11,7 @@ export function stop() {
 }
 
 // @ts-ignore
-const ListItem = proxyCache(() => {
+const ListItem: JSX.Element = proxyCache(() => {
     const filter = byStrings(".__invalid_circleButtonMask");
     return getModule(m => filter(m.render))
 }, true);
