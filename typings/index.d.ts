@@ -56,6 +56,9 @@ interface DiscordWindow {
   // DiscordNative?: DiscordNative
 }
 
+// Typing is kinda wrong, only exists in the preloads / main
+declare const __node_require__: NodeJS.Require;
+
 declare global {
   interface Window extends DiscordWindow {}
 }

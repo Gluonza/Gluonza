@@ -119,7 +119,7 @@ const makeGlounzaAsar = async () => {
 
     if (!fs.existsSync(join(dirname, "..", "app"))) fs.mkdirSync(join(dirname, "..", "app"));
  
-    await fs.promises.writeFile(join(dirname, "..", "app", "index.js"), `require(${gluonzaPath});\nrequire("../glounza.app.asar");`);
+    await fs.promises.writeFile(join(dirname, "..", "app", "index.js"), `if (!process.argv.includes("--vanilla")) require(${gluonzaPath});\nrequire("../glounza.app.asar");`);
     await fs.promises.writeFile(join(dirname, "..", "app", "package.json"), JSON.stringify({
         main: "./index.js"
     }));

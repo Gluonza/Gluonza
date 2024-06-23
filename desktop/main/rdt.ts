@@ -4,16 +4,17 @@ import path from "node:path";
 import AdmZip from "adm-zip";
 import electron from "electron";
 
-async function downloadRDT() {
-  const RDT_PATH = path.join(electron.app.getPath("appData"), "gluonza", "fmkadmapgofadopljbjfkapdkoienihi");
-  const RDT_ZIP_PATH = `${RDT_PATH}.zip`;
+const RDT_PATH = path.join(electron.app.getPath("appData"), "gluonza", "fmkadmapgofadopljbjfkapdkoienihi");
+const RDT_ZIP_PATH = `${RDT_PATH}.zip`;
+const RDT_DOWNLOAD_URL = "https://replugged.dev/api/v1/react-devtools";
 
-  if (existsSync(RDT_PATH)) return RDT_PATH;
+async function downloadRDT() {
+  if (existsSync(RDT_PATH)) return;
 
   let buffer: Buffer;
 
   if (!existsSync(RDT_ZIP_PATH)) {
-    const request = await fetch("https://replugged.dev/api/v1/react-devtools", {
+    const request = await fetch(RDT_DOWNLOAD_URL, {
       headers: {
         "User-Agent": electron.session.defaultSession.getUserAgent()
       }
@@ -26,10 +27,10 @@ async function downloadRDT() {
 
   const zip = new AdmZip(buffer);
 
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     zip.extractAllToAsync(RDT_PATH, true, false, (error) => {
       if (error) return reject(error);
-      resolve(RDT_PATH);
+      resolve();
     })
   });
 }
@@ -37,7 +38,7 @@ async function downloadRDT() {
 export async function downloadAndLoadRDT() {
   await electron.app.whenReady();
 
-  const RDT_PATH = await downloadRDT();
+  await downloadRDT();
 
   await electron.session.defaultSession.loadExtension(RDT_PATH, { allowFileAccess: true });
 }

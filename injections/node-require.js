@@ -1,0 +1,1 @@
+export const __node_require__ = new Proxy(require, Reflect);

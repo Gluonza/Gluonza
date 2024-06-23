@@ -24,14 +24,11 @@ class PatchedBrowserWindow extends BrowserWindow {
             env.DISCORD_PRELOADER_SPLASH = opts.webPreferences!.preload;
 
             opts.webPreferences!.preload = join(__dirname, "./splash.js");
-        }// no idea if this works
-        else if (opts.webPreferences.preload.includes("overlay")) {
-            env.DISCORD_PRELOADER_OVERLAY = opts.webPreferences!.preload;
-
-            opts.webPreferences!.preload = join(__dirname, "./overlay.js");
         }
-        // If this isnt any of those 3 just stop
-        else super(opts);
+        else {
+            super(opts);
+            return;
+        }
 
         return new BrowserWindow(opts);
 

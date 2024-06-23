@@ -26,7 +26,9 @@ console.log("Compiled gluonza");
 await esbuild.build({
   entryPoints: [ "desktop/main/index.ts" ],
   outfile: "build/index.js",
-  inject: [ ],
+  inject: [
+    "./injections/node-require.js"
+  ],
   plugins: [
     
   ],
@@ -42,7 +44,9 @@ console.log("Compiled desktop/main");
 await esbuild.build({
   entryPoints: [ "desktop/renderer/index.ts" ],
   outfile: "build/preload.js",
-  inject: [ ],
+  inject: [
+    "./injections/node-require.js"
+  ],
   plugins: [
     
   ],
@@ -58,7 +62,9 @@ console.log("Compiled desktop/renderer");
 await esbuild.build({
   entryPoints: [ "desktop/splash/index.ts" ],
   outfile: "build/splash.js",
-  inject: [ ],
+  inject: [
+    "./injections/node-require.js"
+  ],
   plugins: [
     
   ],
@@ -74,7 +80,9 @@ console.log("Compiled desktop/splash");
 await esbuild.build({
   entryPoints: [ "desktop/overlay/index.ts" ],
   outfile: "build/overlay.js",
-  inject: [ ],
+  inject: [
+    "./injections/node-require.js"
+  ],
   plugins: [
     
   ],
