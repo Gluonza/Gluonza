@@ -191,6 +191,7 @@ export const DashboardStyle = `
     border-radius: 10px;
     padding: 20px;
     max-width: 600px;
+    height: fit-content;
     width: 100%;
 }
 
