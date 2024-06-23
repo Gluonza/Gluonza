@@ -12,8 +12,49 @@ export const DashboardStyle = `
     --light-text: #000000;
     --dark-text: #ffffff;
 }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+.app {
+    z-index: 3001;
+    animation: fadeIn 0.3s ease-out forwards;
+}
 [class*="layers"] {display: flex; flex-direction: row;}
-.app { z-index: 3001; }
+.app.closing {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+.backdrop {
+    width: 300%;
+    position: absolute;
+    display: inline-block;
+    padding: 20px 15px 0;
+    vertical-align: top;
+    background: rgba(0, 0, 0, 0.7); 
+    backdrop-filter: blur(0px);
+    height: 100%;
+}
+
 .sidebar {
     width: 200px; /* idk what width you set it to */
     z-index: 3001;
@@ -22,7 +63,11 @@ export const DashboardStyle = `
     display: inline-block;
     height: 100%;
 }
-.sidebar .logo { background: url('https://cdn.discordapp.com/attachments/1128887206476513420/1254141344964808744/Gluonza.png?ex=667869a5&is=66771825&hm=e646e5417470663f34f9c510ee2c2c0a8dff27a842cebde18901570ab5bc846e&') center/cover; } /* Replace with an actual link when done */
+
+.sidebar .logo {
+    background: url('https://cdn.discordapp.com/attachments/1128887206476513420/1254141344964808744/Gluonza.png?ex=667869a5&is=66771825&hm=e646e5417470663f34f9c510ee2c2c0a8dff27a842cebde18901570ab5bc846e&') center/cover;
+} /* Once this link runs off the ex tag. Ill replace it with a Github link. Thankies pastel love */
+
 .sidebar .header {
     padding: 6px 0;
     margin-left: 10px;
@@ -32,11 +77,13 @@ export const DashboardStyle = `
     line-height: 16px;
     text-transform: uppercase;
     font-weight: 600;
-    font-family: Whitney,  sans-serif;
+    font-family: Whitney, sans-serif;
 }
+
 .sidebar .settings_tab {
     border-radius: 3px;
-    margin-bottom: 2px; padding: 6px 10px;
+    margin-bottom: 2px; 
+    padding: 6px 10px;
     color: #b9bbbe;
     cursor: pointer;
     font-size: 17px;
@@ -45,16 +92,19 @@ export const DashboardStyle = `
     font-family: Whitney, sans-serif;
     overflow: hidden;
     text-overflow: ellipsis;
-    &:hover {
-        background-color: rgba(185, 185, 185, .1);
-        color: #f6f6f6;
-        }
-      &.active {
-        background: #6873c8;
-        color: #fff;
-        cursor: default;
-    }
 }
+
+.sidebar .settings_tab:hover {
+    background-color: rgba(185, 185, 185, .1);
+    color: #f6f6f6;
+}
+
+.sidebar .settings_tab.active {
+    background: #6873c8;
+    color: #fff;
+    cursor: default;
+}
+
 .main {
     width: 500px;
     display: inline-block;
@@ -63,25 +113,28 @@ export const DashboardStyle = `
     background: #36393e;
     height: 100%;
 }
+
 .headertext {
     color: #6873c8;
     text-transform: uppercase;
     font-weight: 600;
     font-size: 16px;
     flex: 1 1 auto;
-    font-family: Whitney,  sans-serif;
+    font-family: Whitney, sans-serif;
 }
+
 .main h5 {
     color: #b9bbbe;
     text-transform: uppercase;
     font-weight: 600;
     font-size: 12px;
-    font-family: Whitney,  sans-serif;
+    font-family: Whitney, sans-serif;
 }
+
 .main button {
     display: flex;
     align-items: center;
-    justify-Menu: center;
+    justify-content: center;
     cursor: pointer;
     color: #fff;
     text-align: center;
@@ -92,85 +145,90 @@ export const DashboardStyle = `
     outline: none !important;
     border-radius: 3px;
     padding: 5px 10px;
-    &:hover {
-        background: #5d69c4;
-    }
 }
+
+.main button:hover {
+    background: #5d69c4;
+}
+
 .main .hint {
     color: #72767d;
     font-size: 14px;
     font-weight: 500;
     margin: 10px 0;
-    font-family: Whitney,  sans-serif;
+    font-family: Whitney, sans-serif;
 }
+
 .form_divider {
     height: 1px;
     margin: 15px 0;
     background: hsla(218, 5%, 47%, .3);
 }
-  @media (prefers-color-scheme: dark) {
-    body {
-      background-color: var(--dark-bg);
-      color: var(--dark-text);
-    }
-  }
 
-  @media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
     body {
-      background-color: var(--light-bg);
-      color: var(--light-text);
+        background-color: var(--dark-bg);
+        color: var(--dark-text);
     }
-  }
+}
 
-  .credit-screen {
+@media (prefers-color-scheme: light) {
+    body {
+        background-color: var(--light-bg);
+        color: var(--light-text);
+    }
+}
+
+.credit-screen {
     display: flex;
     height: 100vh;
     padding: 20px;
-  }
+}
 
-  .container {
+.container {
     text-align: center;
     border: 2px solid var(--primary-color);
     border-radius: 10px;
     padding: 20px;
     max-width: 600px;
     width: 100%;
-  }
+}
 
-  credit-screen. h1 {
+.credit-screen h1 {
     color: var(--primary-color);
     margin-bottom: 20px;
-  }
+}
 
-  .credit-screen ul {
+.credit-screen ul {
     list-style: none;
     padding: 0;
-  }
+}
 
-  .credit-screen li {
+.credit-screen li {
     display: flex;
     align-items: center;
     margin: 10px 0;
-  }
+}
 
-  .credit-screen img {
+.credit-screen img {
     border-radius: 50%;
     margin-right: 10px;
-  }
+}
 
-  .info {
+.info {
     text-align: left;
-  }
+}
 
-  .info strong {
+.info strong {
     display: block;
     font-size: 1.1em;
-  }
+}
 
-  .info span {
+.info span {
     font-size: 0.9em;
     color: var(--primary-color);
-  }`;
+}
+`;
 
 interface SettingsTabProps {
     name: string;
@@ -302,7 +360,7 @@ const Sidebar: ({onClose, activeTab, setActiveTab}: {
     return (
         <div className="sidebar">
             <div className="logo" style={{ height: '50px' }}></div>
-            <div className="placeholder" onClick={() => { onClose() }} style={{ background: 'red', height: '30px', width: '30px', position: 'absolute', top: '0px', right: '0' }}></div>
+            <div className="placeholder" onClick={() => { onClose() }} style={{ background: 'red', height: '30px', width: '30px', position: 'absolute', top: '0px', right: '0', padding: '0px', margin: '20px' }}></div>
             <div className="header">Internal</div>
             {internalTabs.map(tab => (
                 <SettingsTab
@@ -367,13 +425,30 @@ interface MainDashboardProps {
     onClose: () => void;
 }
 
+
+async function sleep(timeout: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
 export const MainDashboard: ({onClose}: { onClose: any }) => JSX.Element = ({ onClose }) => {
     const [activeTab, setActiveTab] = React.useState("Connectivity");
-
+    const [closing, setClosing] = React.useState(false);
+    
+    const handleClose = async () =>
+    {
+        setClosing(true)
+        await sleep(300).then(() => // I don't think this is needed but sure
+        {
+            onClose();
+        })
+    }
+    
     return (
-        <div className="app">
-            <Sidebar onClose={onClose} activeTab={activeTab} setActiveTab={setActiveTab} />
-            <Main activeTab={activeTab} />
+        // Closing the window onClose/backdrop click.
+        <div className={`app ${closing ? 'closing' : ''}`}>
+            <Sidebar onClose={handleClose} activeTab={activeTab} setActiveTab={setActiveTab}/>
+            <Main activeTab={activeTab}/>
+            <div className="backdrop" onClick={handleClose}/>
         </div>
     );
 };
