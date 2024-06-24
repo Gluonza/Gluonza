@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { ipcRenderer, contextBridge } from "electron";
 import {plugins} from "../../gluonza/api/systems/plugins.js";
-import {MOD_NAME} from "common/consts.js";
+import {coreLogger, MOD_NAME} from "common/consts.js";
 
 const getPath = (path: Parameters<Electron.App["getPath"]>[0]) => ipcRenderer.sendSync("@gluonza/get-path", path) as string;
 
@@ -16,13 +16,34 @@ const directories = {
   themes: path.join(appdata, "gluonza", "themes")
 }
 
+
+function getPluginDirectories(baseDir: fs.PathLike) {
+  return fs.readdirSync(baseDir, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
+}
+
+function readManifest(manifestPath: fs.PathOrFileDescriptor) {
+  return JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+}
+
+function getMissingManifestFields(manifest: { name: any; authors: any; description: any; version: any; }) {
+  return [
+    !manifest.name && 'name',
+    !manifest.authors && 'authors',
+    !manifest.description && 'description',
+    !manifest.version && 'version',
+  ].filter(Boolean);
+}
+
+function logWarning(pluginDir: string, message: string) {
+  coreLogger.warn(`${MOD_NAME} -> IPC: ${message} in ${path.join(directories.plugins, pluginDir)}`);
+}
+
 function getNativePlugins() {
   try {
     const plugins = [];
-
-    const pluginDirectories = fs.readdirSync(directories.plugins, { withFileTypes: true })
-        .filter(dirent => dirent.isDirectory())
-        .map(dirent => dirent.name);
+    const pluginDirectories = getPluginDirectories(directories.plugins);
 
     for (const dir of pluginDirectories) {
       try {
@@ -30,39 +51,24 @@ function getNativePlugins() {
         const indexPath = path.join(directories.plugins, dir, 'index.js');
 
         if (fs.existsSync(manifestPath) && fs.existsSync(indexPath)) {
-          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
-
+          const manifest = readManifest(manifestPath);
           const source = fs.readFileSync(indexPath, 'utf-8');
+          const missingManifestFields = getMissingManifestFields(manifest);
 
-          const missingManifestFields = [
-            !manifest.name && 'name',
-            !manifest.authors && 'authors',
-            !manifest.description && 'description',
-            !manifest.version && 'version',
-          ].filter(Boolean);
+          if (!missingManifestFields.includes('name')) plugins.push({ manifest, source });
 
-          if (!missingManifestFields.includes('name')) {
-
-            plugins.push({
-              manifest,
-              source,
-            });
-          }
-
-          if (missingManifestFields.length > 0)
-            console.warn(
-                `${MOD_NAME} -> IPC:`,
-                `manifest for plugin in ${path.join(directories.plugins, dir)} is missing field(s):`,
-                `{ ${missingManifestFields.join(', ')} };`,
-                missingManifestFields.includes('name')
-                    ? 'ignoring since important identifier props like { name } is omitted.'
-                    : 'allowing since important identifier props like { name } is not omitted.',
+          if (missingManifestFields.length > 0) {
+            logWarning(
+                dir,
+                `Manifest is missing the following properties: { ${missingManifestFields.join(', ')} }; ` +
+                (missingManifestFields.includes('name')
+                    ? 'Ignoring. '
+                    : 'Loading.')
             );
-        } else
-          console.warn(
-              `${MOD_NAME} -> IPC:`,
-              `manifest.json or index.js not found in ${path.join(directories.plugins, dir)}`
-          );
+          }
+        } else {
+          logWarning(dir, 'manifest.json or index.js missing. Plugin will now not load.');
+        }
       } catch (error) {
         console.warn('error:', error);
       }
@@ -70,10 +76,11 @@ function getNativePlugins() {
 
     return { status: 'success', plugins };
   } catch (error) {
-    console.warn(`${MOD_NAME} -> IPC:`, 'Error loading plugins:', error);
+    console.warn(`${MOD_NAME} -> IPC: Error loading plugins:`, error);
     return { status: 'error', message: error.message };
   }
 }
+
 
 export const gluonzaNative = {
   app: {
