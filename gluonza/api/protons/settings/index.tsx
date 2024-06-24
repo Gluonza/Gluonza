@@ -51,8 +51,15 @@ export function Dashboard() {
 
 injectCSS('settings', DashboardStyle)
 
+const Icon = () => {
+    return (<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <text x="20" y="60" fontFamily="Arial, sans-serif" fontSize="60" fill="#5f6ddc" fontWeight="bold">G</text>
+        <text x="40" y="80" fontFamily="Arial, sans-serif" fontSize="60" fill="#ffffff" fontWeight="bold">Z</text>
+    </svg>)
+}
+
 export function OpenSettingsButton() {
-    return <ListItem tooltip={'Glounza Menu'} onClick={() => {
+    return <ListItem color={'#6873c8'} icon={Icon} tooltip={'Glounza Menu'} onClick={() => {
         setState(!getState())
     }}/>
 }
