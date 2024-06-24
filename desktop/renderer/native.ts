@@ -90,6 +90,9 @@ export const gluonzaNative = {
     },
     restart() {
       ipcRenderer.invoke("@gluonza/restart");
+    },
+    openPath(path: string) {
+      ipcRenderer.invoke('@gluonza/open-path', {p: path});
     }
   },
   plugins: {getNativePlugins},

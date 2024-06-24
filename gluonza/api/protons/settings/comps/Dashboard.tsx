@@ -1,5 +1,5 @@
 ﻿import {proxyCache} from "../../../../util.js";
-import {getModule, getStore} from "../../../webpack/index.js";
+import {getModule, getProxy, getProxyByKeys, getStore} from "../../../webpack/index.js";
 const React = proxyCache(() => {
     return window.gluonza.React
 })
@@ -237,10 +237,11 @@ interface SettingsTabProps {
     onClick: () => void;
 }
 
-const CloseButton: JSX.Element = proxyCache(() => {
+const CloseButton: JSX.Element = proxyCache( () => {
     return getModule(x=>x.Z && x.default.Variants)
 })
 
+const Components = getProxyByKeys([ "Anchor" ]);
 const SettingsTab: ({name, active, onClick}: { name: any; active: any; onClick: any }) => JSX.Element = ({ name, active, onClick }) => {
     return (
         <div className={`settings_tab ${active ? 'active' : ''}`} onClick={onClick}>{name}</div>
@@ -324,19 +325,32 @@ const CSSEditorMenu: () => JSX.Element = () => (
     </div>
 );
 
-const PluginsMenu: () => JSX.Element = () => (
-    <div>
-        <h5 className="header accent">Plugins Settings</h5>
-        <button>Save Changes</button>
-        <p className="hint">Manage your plugins here.</p>
-    </div>
-);
+const PluginsMenu: React.FC = () => {
+    return (
+        <div>
+            <h5 className="header accent">Plugin Settings</h5>
+            <Components.Clickable onClick={() => {window.gluonzaNative.app.openPath('plugins')}} style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
+                <FolderSVG />
+            </Components.Clickable>
+            <p className="hint">Manage your plugins here.</p>
+        </div>
+    )
+}
+
+const FolderSVG: () => JSX.Element = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+        <rect x="3" y="8" width="14" height="4" rx="2" ry="1" fill="#ebc262"/>
+        <rect x="3" y="10" width="18" height="11" rx="2" ry="2" fill="#F1D592"/>
+    </svg>
+)
 
 const ThemesMenu: () => JSX.Element = () => (
     <div>
         <h5 className="header accent">Themes Settings</h5>
-        <button>Save Changes</button>
-        <p className="hint">Customize your themes here.</p>
+        <Components.Clickable tag={'dick'} onClick={() => {window.gluonzaNative.app.openPath('themes')}} style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
+            <FolderSVG />
+        </Components.Clickable>
+        <p className="hint">Manage your themes here.</p>
     </div>
 );
 
