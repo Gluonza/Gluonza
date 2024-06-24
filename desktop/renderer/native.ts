@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { ipcRenderer, contextBridge } from "electron";
-import {plugins} from "../../gluonza/api/systems/plugins.js";
 import {coreLogger, MOD_NAME} from "common/consts.js";
 
 const getPath = (path: Parameters<Electron.App["getPath"]>[0]) => ipcRenderer.sendSync("@gluonza/get-path", path) as string;

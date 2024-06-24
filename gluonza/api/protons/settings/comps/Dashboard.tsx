@@ -308,14 +308,6 @@ const UIMenu: () => JSX.Element = () => (
     </div>
 );
 
-const EmotesMenu: () => JSX.Element = () => (
-    <div>
-        <h5 className="header accent">Emotes Settings</h5>
-        <button>Save Changes</button>
-        <p className="hint">Manage your emotes here.</p>
-    </div>
-);
-
 const SecurityPrivacyMenu: () => JSX.Element = () => (
     <div>
         <h5 className="header accent">Security and Privacy Settings</h5>
@@ -403,8 +395,6 @@ const Main: ({activeTab}: { activeTab: any }) => JSX.Element = ({ activeTab }) =
                 return <CoreMenu />;
             case "UI":
                 return <UIMenu />;
-            case "Emotes":
-                return <EmotesMenu />;
             case "Security and Privacy":
                 return <SecurityPrivacyMenu />;
             case "CSS Editor":
