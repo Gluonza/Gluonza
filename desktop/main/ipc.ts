@@ -21,3 +21,7 @@ ipcMain.handle("@gluonza/open-path", (event, { p }) => {
 
   return { status: 'success' };
 });
+
+ipcMain.handle('update-plugins', (event, pluginPath) => {
+  
+});

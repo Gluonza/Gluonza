@@ -31,3 +31,18 @@ export function startPlugins() {
         coreLogger.info(`Started plugin: ${plugin.manifest.name}`)
     })
 }
+
+function reloadPlugin(pluginPath: string): void { // pluginPath is just named-index in plugins array.
+    if (plugins[pluginPath]) {
+        plugins[pluginPath].stop();
+    }
+    
+    delete require.cache[require.resolve(pluginPath)];
+    
+    const module = require(pluginPath);
+    
+    if (module && typeof module.start === 'function' && typeof module.stop === 'function') {
+        plugins[pluginPath] = module;
+        plugins[pluginPath].start();
+    }
+}

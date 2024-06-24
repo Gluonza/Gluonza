@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import { ipcRenderer, contextBridge } from "electron";
-import {coreLogger, MOD_NAME} from "common/consts.js";
+import { ipcRenderer, contextBridge, app } from "electron";
+import { coreLogger, MOD_NAME } from "common/consts.js";
+import chokidar from "chokidar";
 
 const getPath = (path: Parameters<Electron.App["getPath"]>[0]) => ipcRenderer.sendSync("@gluonza/get-path", path) as string;
-
 const release = ipcRenderer.sendSync("DISCORD_APP_GET_RELEASE_CHANNEL_SYNC") as string;
 
 const appdata = getPath("appData");
@@ -15,6 +15,14 @@ const directories = {
   themes: path.join(appdata, "gluonza", "themes")
 }
 
+const listeners: { [event: string]: Function[] } = {
+  pluginAdd: [],
+  pluginChange: [],
+  pluginUnlink: [],
+  themeChange: [],
+  themeAdd: [],
+  themeUnlink: []
+};
 
 function getPluginDirectories(baseDir: fs.PathLike) {
   return fs.readdirSync(baseDir, { withFileTypes: true })
@@ -80,6 +88,48 @@ function getNativePlugins() {
   }
 }
 
+function startWatcher() {
+  const PathPlugins = path.join(appdata, MOD_NAME, 'plugins');
+  const watcherPlugins = chokidar.watch(PathPlugins, {
+    ignored: /(^|[\/\\])\../,
+    persistent: true,
+    ignoreInitial: true
+  });
+
+  watcherPlugins
+      .on('add', (filePath) => {
+        coreLogger.info(filePath);
+        listeners.pluginAdd.forEach(callback => callback(filePath));
+      })
+      .on('change', (filePath) => {
+        coreLogger.info(filePath);
+        listeners.pluginChange.forEach(callback => callback(filePath));
+      })
+      .on('unlink', (filePath) => {
+        coreLogger.info(filePath);
+        listeners.pluginUnlink.forEach(callback => callback(filePath));
+      });
+
+  const PathThemes = path.join(appdata, MOD_NAME, 'themes');
+  const watcherThemes = chokidar.watch(PathThemes, {
+    ignored: /(^|[\/\\])\../,
+    persistent: true,
+    ignoreInitial: true
+  });
+
+  watcherThemes
+      .on('add', (filePath) => {
+        listeners.themeAdd.forEach(callback => callback(filePath));
+      })
+      .on('change', (filePath) => {
+        listeners.themeChange.forEach(callback => callback(filePath));
+      })
+      .on('unlink', (filePath) => {
+        listeners.themeUnlink.forEach(callback => callback(filePath));
+      });
+}
+
+startWatcher();
 
 export const gluonzaNative = {
   app: {
@@ -92,24 +142,35 @@ export const gluonzaNative = {
       ipcRenderer.invoke("@gluonza/restart");
     },
     openPath(path: string) {
-      ipcRenderer.invoke('@gluonza/open-path', {p: path});
+      ipcRenderer.invoke('@gluonza/open-path', { p: path });
     }
   },
-  plugins: {getNativePlugins},
+  plugins: { getNativePlugins },
   storage: {
     read(name: string) {
       const fullpath = path.join(directories.settings, path.basename(name));
       if (!fs.existsSync(fullpath)) return "{}";
-      return JSON.parse(fs.readFileSync(fullpath, "binary"))
+      return JSON.parse(fs.readFileSync(fullpath, "binary"));
     },
     write(name: string, data: string) {
       const fullpath = path.join(directories.settings, path.basename(name));
-
-      const parsedData = JSON.stringify(data)
+      const parsedData = JSON.stringify(data);
       fs.writeFileSync(fullpath, parsedData, "binary");
     }
+  },
+  listeners: {
+    addListener(event: keyof typeof listeners, callback: Function) {
+      if (listeners[event]) {
+        listeners[event].push(callback);
+      }
+    },
+    removeListener(event: keyof typeof listeners, callback: Function) {
+      if (listeners[event]) {
+        listeners[event] = listeners[event].filter(cb => cb !== callback);
+      }
+    }
   }
-}
+};
 
 if (process.contextIsolated) contextBridge.exposeInMainWorld("gluonzaNative", gluonzaNative);
 Object.defineProperty(window, "gluonzaNative", {
