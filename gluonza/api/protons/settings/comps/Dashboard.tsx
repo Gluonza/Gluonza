@@ -364,7 +364,7 @@ const Sidebar: ({onClose, activeTab, setActiveTab}: {
 
     return (
         <div className="sidebar">
-            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly'}}>
+            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
                 <div className="logo" style={{height: '50px', width: '230px'}}></div>
                 <CloseButton.Z className="placeholder" keybind={"ESC"} closeAction={() => { onClose() }} style={{ background: 'red', position: 'absolute', top: '0px', right: '0', padding: '0px', margin: '20px' }}></CloseButton.Z>
             </div>
