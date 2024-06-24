@@ -145,7 +145,7 @@ export const gluonzaNative = {
       ipcRenderer.invoke('@gluonza/open-path', { p: path });
     }
   },
-  plugins: { getNativePlugins },
+  plugins: { getNativePlugins, read: (filepath: any) => {return ipcRenderer.invoke('read-file', {filepath: filepath})} },
   storage: {
     read(name: string) {
       const fullpath = path.join(directories.settings, path.basename(name));

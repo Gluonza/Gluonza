@@ -32,17 +32,37 @@ export function startPlugins() {
     })
 }
 
-function reloadPlugin(pluginPath: string): void { // pluginPath is just named-index in plugins array.
-    if (plugins[pluginPath]) {
-        plugins[pluginPath].stop();
+function reloadPlugin(pluginPath: string, module: {}): void { // pluginPath is just named-index in plugins array.
+    const findPlugin = plugins.find(x=>x.manifest.name === pluginPath);
+    if (findPlugin) {
+        findPlugin.module.stop();
     }
     
-    delete require.cache[require.resolve(pluginPath)];
-    
-    const module = require(pluginPath);
+    delete findPlugin.module;
     
     if (module && typeof module.start === 'function' && typeof module.stop === 'function') {
-        plugins[pluginPath] = module;
-        plugins[pluginPath].start();
+        findPlugin.module = module;
+        findPlugin.module.start();
     }
 }
+
+window.gluonzaNative.listeners.addListener("pluginChange", async (a, b) => {
+    coreLogger.info(`Plugin ${a} has changed`);
+
+    try {
+        const plugin = await window.gluonzaNative.plugins.read(a);
+
+        const module = {
+            exports: {},
+            manifest: JSON.parse(plugin.manifest)
+        };
+
+        new Function("module", "exports", "", plugin.source)(module, module.exports, function () {
+            throw "no";
+        });
+
+        reloadPlugin(module.manifest.name, module.exports)
+    } catch (error) {
+        coreLogger.error(`Failed to process plugin ${a}:`, error);
+    }
+});
