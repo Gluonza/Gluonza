@@ -5,6 +5,7 @@ import {readFileSync} from "fs";
 import path from "path";
 import {waitForElementRemoved, waitForNode} from "common/dom.js";
 import {coreLogger} from "common/consts";
+import './native.js'
 
 export const removalNodeQuery = '[class*="container_"][class*="fixClipping_"]'
 
