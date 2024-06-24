@@ -4,6 +4,8 @@ export const coreMods = [require('../protons/settings/index.js'), require('../pr
 
 export function startMainPatches() {
     coreMods.forEach(mod => {
-        addPlainTextPatch(...mod.patches)
+        if (mod?.patches){
+            addPlainTextPatch(...mod.patches)
+        }
     })
 }
