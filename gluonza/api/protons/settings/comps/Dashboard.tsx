@@ -1,5 +1,7 @@
 ﻿import {proxyCache} from "../../../../util.js";
-import {getModule, getProxy, getProxyByKeys, getStore} from "../../../webpack/index.js";
+import {getModule, getProxy, getProxyByKeys, getProxyByStrings, getStore} from "../../../webpack/index.js";
+import {gluonza} from "../../../../window.js";
+import {getPlugins} from "../../../systems/plugins.js";
 const React = proxyCache(() => {
     return window.gluonza.React
 })
@@ -229,6 +231,63 @@ export const DashboardStyle = `
     font-size: 0.9em;
     color: var(--primary-color);
 }
+
+.tabs {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    font-family: Whitney,  sans-serif;
+}
+.tabs .local, .tabs .online {
+    color: #b9bbbe;
+    border-bottom: 2px solid hsla(218, 5%, 47%, .3);
+    width: 100%;
+    text-align: center;
+    &:hover:not(.selected) {border-color: #6873c890;}
+    &.selected {border-color: #6873c8;}
+}
+
+.gluonza_card {
+    padding: 16px;
+    font-family: Whitney,  sans-serif;
+}
+.gluonza_addon_header {
+    display: flex; 
+    align-items: center;
+    justify-content: start;
+}
+.gluonza_addon_title {
+    color: #b9bbbe;
+    margin-left: 8px;
+    font-weight: bold;
+    font-size: 18px;
+}
+.gluonza_addon_switch, .gluonza_addon_controls {margin-left: auto;}
+.gluonza_addon_footer {
+    display: flex;
+    align-items: end;
+    justify-content: start;
+}
+.gluonza_addon_description {color: #8a8c90; font-weight: bold; font-size: 14px;}
+.gluonza_addon_footer span {color: #6873c8; font-size: 12px;}
+.gluonza_addon_controls {
+    display: flex;
+}
+.gluonza_addon_button {
+    background: #6873c8;
+    color: white;
+    padding: 3px;
+}
+.gluonza_addon_button:first-of-type {
+    border-radius: 3px 0 0 3px;
+}
+.gluonza_addon_button:last-of-type {
+    border-radius: 0 3px 3px 0;
+}
+.gluonza_addon_divider {
+    height: 1px;
+    background: hsla(218, 5%, 47%, .3);
+}
 `;
 
 interface SettingsTabProps {
@@ -242,7 +301,65 @@ const CloseButton: JSX.Element = proxyCache( () => {
 })
 
 const Components = getProxyByKeys([ "Anchor" ]);
-const SettingsTab: ({name, active, onClick}: { name: any; active: any; onClick: any }) => JSX.Element = ({ name, active, onClick }) => {
+
+const Tab = ({ labels, selectedTab, onSelectTab }) => {
+    return (
+        <div className="tabs">
+            {labels.map((label, index) => (
+                <div
+                    key={index}
+                    className={`tab ${selectedTab === label ? 'selected' : ''}`}
+                    onClick={() => onSelectTab(label)}
+                >
+                    {label}
+                </div>
+            ))}
+        </div>
+    );
+};
+
+const Switch = getProxy(() => {
+    return getProxyByStrings([ "xMinYMid meet" ]);
+})
+
+const Card = ({ icon, name, description, version, authors, onEdit, onSettings, onRefresh, onDelete }) => {
+    const buttons = [
+        { label: "✏️", onClick: onEdit },
+        { label: "⚙️", onClick: onSettings },
+        { label: "↻", onClick: onRefresh },
+        { label: "🗑️", onClick: onDelete }
+    ];
+
+    const titleStyle = icon == undefined ? { marginLeft: '0px !important' } : {};
+
+    return (
+        <div className="gluonza_card">
+            <div className="gluonza_addon_header">
+                {icon !== undefined && <img src={icon} width="32" alt="Icon"/>}
+                <div className="gluonza_addon_title" style={titleStyle}>{name}</div>
+                <Switch className="gluonza_addon_switch">switch</Switch>
+            </div>
+            <div className="gluonza_addon_description">{description}</div>
+            <div className="gluonza_addon_footer">
+                <span>{version}</span>
+                <span>&nbspby&nbsp</span>
+                <span>{authors?.join?.(', ')}</span>
+                <div className="gluonza_addon_controls">
+                    {buttons.map((button, index) => (
+                        <div key={index} className="gluonza_addon_button" onClick={button.onClick}>{button.label}</div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
+const SettingsTab: ({name, active, onClick}: { name: any; active: any; onClick: any }) => JSX.Element = ({
+     name,
+     active,
+     onClick
+ }) => {
     return (
         <div className={`settings_tab ${active ? 'active' : ''}`} onClick={onClick}>{name}</div>
     );
@@ -325,17 +442,52 @@ const CSSEditorMenu: () => JSX.Element = () => (
     </div>
 );
 
-const PluginsMenu: React.FC = () => {
+const PluginsMenu = () => {
+    const plugins = getPlugins();
+
+    const handleEdit = (plugin: any) => {
+        console.log("Edit", plugin);
+    };
+
+    const handleSettings = (plugin) => {
+        console.log("Settings", plugin);
+    };
+
+    const handleRefresh = (plugin) => {
+        console.log("Refresh", plugin);
+    };
+
+    const handleDelete = (plugin) => {
+        console.log("Delete", plugin);
+    };
+
     return (
         <div>
             <h5 className="header accent">Plugin Settings</h5>
-            <Components.Clickable onClick={() => {window.gluonzaNative.app.openPath('plugins')}} style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
-                <FolderSVG />
+            <Components.Clickable onClick={() => {
+                window.gluonzaNative.app.openPath('plugins')
+            }} style={{justifyContent: 'center', alignItems: 'center', alignSelf: 'center'}}>
+                <FolderSVG/>
             </Components.Clickable>
+            <div className="cards-container">
+                {plugins.map((plugin, index) => (
+                    <React.Fragment key={index}>
+                        <Card
+                            {...plugin.manifest}
+                            onEdit={() => handleEdit(plugin)}
+                            onSettings={() => handleSettings(plugin)}
+                            onRefresh={() => handleRefresh(plugin)}
+                            onDelete={() => handleDelete(plugin)}
+                        />
+                        <div className="gluonza_addon_divider"></div>
+                    </React.Fragment>
+                ))}
+            </div>
             <p className="hint">Manage your plugins here.</p>
         </div>
     )
 }
+
 
 const FolderSVG: () => JSX.Element = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
