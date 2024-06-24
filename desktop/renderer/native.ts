@@ -98,12 +98,13 @@ export const gluonzaNative = {
     read(name: string) {
       const fullpath = path.join(directories.settings, path.basename(name));
       if (!fs.existsSync(fullpath)) return "{}";
-      return fs.readFileSync(fullpath, "binary");
+      return JSON.parse(fs.readFileSync(fullpath, "binary"))
     },
     write(name: string, data: string) {
       const fullpath = path.join(directories.settings, path.basename(name));
 
-      fs.writeFileSync(fullpath, data, "binary");
+      const parsedData = JSON.stringify(data)
+      fs.writeFileSync(fullpath, parsedData, "binary");
     }
   }
 }
