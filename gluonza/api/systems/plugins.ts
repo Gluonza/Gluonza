@@ -32,37 +32,58 @@ export function startPlugins() {
     })
 }
 
-function reloadPlugin(pluginPath: string, module: {}): void { // pluginPath is just named-index in plugins array.
-    const findPlugin = plugins.find(x=>x.manifest.name === pluginPath);
-    if (findPlugin) {
-        findPlugin.module.stop();
+type Plugin = {
+    manifest: {
+        name: string;
+    };
+    module?: {
+        start: () => void;
+        stop: () => void;
+    };
+};
+
+type PluginsArray = Plugin[];
+
+declare const plugins: PluginsArray;
+declare const window: any;
+declare const coreLogger: {
+    info: (message: string) => void;
+    error: (message: string, error: any) => void;
+};
+
+function reloadPlugin(pluginName: string, module: { start: () => void; stop: () => void } | undefined): void {
+    const plugin = plugins.find(p => p.manifest.name === pluginName);
+
+    if (plugin) {
+        plugin.module?.stop();
+        delete plugin.module;
     }
-    
-    delete findPlugin.module;
-    
+
     if (module && typeof module.start === 'function' && typeof module.stop === 'function') {
-        findPlugin.module = module;
-        findPlugin.module.start();
+        if (plugin) {
+            plugin.module = module;
+            plugin.module.start();
+        } else {
+            plugins.push({ manifest: { name: pluginName }, module });
+            module.start();
+        }
     }
 }
 
-window.gluonzaNative.listeners.addListener("pluginChange", async (a, b) => {
-    coreLogger.info(`Plugin ${a} has changed`);
+window.gluonzaNative.listeners.addListener("pluginChange", async (pluginName: string) => {
+    coreLogger.info(`Plugin ${pluginName} has changed`);
 
     try {
-        const plugin = await window.gluonzaNative.plugins.read(a);
-
+        const plugin = await window.gluonzaNative.plugins.read(pluginName);
         const module = {
             exports: {},
             manifest: JSON.parse(plugin.manifest)
         };
 
-        new Function("module", "exports", "", plugin.source)(module, module.exports, function () {
-            throw "no";
-        });
+        new Function("module", "exports", plugin.source)(module, module.exports);
 
-        reloadPlugin(module.manifest.name, module.exports)
+        reloadPlugin(module.manifest.name, module.exports as { start: () => void; stop: () => void });
     } catch (error) {
-        coreLogger.error(`Failed to process plugin ${a}:`, error);
+        coreLogger.error(`Failed to process plugin ${pluginName}:`, error);
     }
 });
