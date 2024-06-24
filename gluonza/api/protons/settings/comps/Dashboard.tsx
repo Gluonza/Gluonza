@@ -1,5 +1,5 @@
 ﻿import {proxyCache} from "../../../../util.js";
-import {getStore} from "../../../webpack/index.js";
+import {getModule, getStore} from "../../../webpack/index.js";
 const React = proxyCache(() => {
     return window.gluonza.React
 })
@@ -56,7 +56,7 @@ export const DashboardStyle = `
 }
 
 .sidebar {
-    width: 200px; /* idk what width you set it to */
+    width: 300px; /* idk what width you set it to */
     z-index: 3001;
     background-color: #292b2f;
     padding: 20px 15px 0;
@@ -237,6 +237,10 @@ interface SettingsTabProps {
     onClick: () => void;
 }
 
+const CloseButton: JSX.Element = proxyCache(() => {
+    return getModule(x=>x.Z && x.default.Variants)
+})
+
 const SettingsTab: ({name, active, onClick}: { name: any; active: any; onClick: any }) => JSX.Element = ({ name, active, onClick }) => {
     return (
         <div className={`settings_tab ${active ? 'active' : ''}`} onClick={onClick}>{name}</div>
@@ -360,8 +364,10 @@ const Sidebar: ({onClose, activeTab, setActiveTab}: {
 
     return (
         <div className="sidebar">
-            <div className="logo" style={{ height: '50px' }}></div>
-            <div className="placeholder" onClick={() => { onClose() }} style={{ background: 'red', height: '30px', width: '30px', position: 'absolute', top: '0px', right: '0', padding: '0px', margin: '20px' }}></div>
+            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly'}}>
+                <div className="logo" style={{height: '50px', width: '230px'}}></div>
+                <CloseButton.Z className="placeholder" keybind={"ESC"} closeAction={() => { onClose() }} style={{ background: 'red', position: 'absolute', top: '0px', right: '0', padding: '0px', margin: '20px' }}></CloseButton.Z>
+            </div>
             <div className="header">Internal</div>
             {internalTabs.map(tab => (
                 <SettingsTab
