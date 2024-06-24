@@ -131,3 +131,36 @@ export function createNullObject<T extends Record<PropertyKey, any> = Record<Pro
 
   return Object.create(null, descriptors);
 }
+
+type StateLike<T> =  [ 
+  () => T, 
+  (newValue: ((previous: T) => T) | T) => T, 
+  () => T  
+]
+
+export function createStateLike<T>(defaultValue: T): StateLike<T> {
+  const listeners = new Set<() => void>();
+
+  let state = defaultValue;
+
+  function getState() {
+    return state;
+  }
+
+  function useState() {
+    return window.gluonza.React.useSyncExternalStore((listener) => {
+      listeners.add(listener);
+      return () => void listeners.delete(listener);
+    }, () => state);
+  }
+
+  function setState($state: ((previous: T) => T) | T) {
+    state = typeof $state === "function" ? ($state as (previous: T) => T)(state) : $state;
+    for (const iterator of listeners) {
+      iterator();
+    }
+    return state;
+  }
+
+  return [getState, setState, useState] as const;
+}

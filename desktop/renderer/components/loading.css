@@ -1,0 +1,142 @@
+
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  position: relative;
+  z-index: 3001;
+  transition: opacity 1s, background-color 0.5s;
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.loading-text {
+  font-size: 4rem;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  animation: fade-in 2s;
+  transition: transform 0.5s, font-size 0.5s;
+}
+
+.gluon {
+  color: #6873c8;
+  animation: fade 1.5s infinite;
+}
+
+.za {
+  font-weight: bold;
+  color: #fff;
+  animation: fade 1.5s infinite 0.75s;
+}
+
+.loading-bar {
+  width: 100%;
+  max-width: 400px;
+  height: 15px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 15px;
+  transition: width 0.5s, height 0.5s;
+}
+
+.loading-progress {
+  width: 100%;
+  height: 100%;
+  background-color: #6873c8;
+  animation: loading 2s infinite;
+}
+
+.quote-text {
+  font-size: 1.5rem;
+  color: var(--text-color);
+  margin-top: 15px;
+  animation: fade-in 2s;
+  transition: font-size 0.5s, margin-top 0.5s;
+  text-wrap: wrap;
+  max-width: 400px;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+@keyframes fade {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes loading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #121212;
+    --text-color: #ffffff;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+  }
+}
+
+@media (max-width: 768px) {
+  .loading-text {
+    font-size: 3rem;
+  }
+
+  .loading-bar {
+    max-width: 300px;
+    height: 12px;
+  }
+
+  .quote-text {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .loading-text {
+    font-size: 2rem;
+  }
+
+  .loading-bar {
+    max-width: 200px;
+    height: 10px;
+  }
+
+  .quote-text {
+    font-size: 1rem;
+  }
+}

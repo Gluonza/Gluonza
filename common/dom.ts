@@ -111,7 +111,16 @@ export function injectCSS(id: string, css: string | null) {
     style.id = id;
     style.textContent = css;
 
-    document.head.appendChild(style);
+    let removed = false;
+    waitForNode("head").then(() => {
+        if (removed) return;
+        document.head.appendChild(style);
+    });
+
+    return () => {
+        removed = true;
+        style.remove();
+    }
 }
 
 export function uninjectCSS(id: string) {

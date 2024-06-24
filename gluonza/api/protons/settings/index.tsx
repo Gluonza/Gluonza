@@ -1,4 +1,4 @@
-﻿import {byStrings, getModule} from "../../webpack/index.js";
+﻿﻿import {byStrings, getModule} from "../../webpack/index.js";
 import {proxyCache} from "../../../util.js";
 import {injectCSS} from "common/dom.js";
 import {DashboardStyle, MainDashboard} from "./comps/Dashboard.js";
@@ -10,10 +10,9 @@ export function start() {
 export function stop() {
 }
 
-// @ts-ignore
-const ListItem: JSX.Element = proxyCache(() => {
+const ListItem: React.FunctionComponent<any> = proxyCache(() => {
     const filter = byStrings(".__invalid_circleButtonMask");
-    return getModule(m => filter(m.render))
+    return getModule(m => filter(m.render))!;
 }, true);
 
 export const [getState, setState, useState] = (function () {

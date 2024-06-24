@@ -68,6 +68,10 @@ declare global {
 }
 interface Window extends DiscordWindow {}
 
+declare module "*.css" {
+  
+}
+
 interface Patch {
   identifier: string;
   find: RegExp;

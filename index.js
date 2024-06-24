@@ -1,10 +1,41 @@
 // @ts-check
 import esbuild from "esbuild";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 
 const dirname = path.join(fileURLToPath(import.meta.url), "..");
+
+/** @type {esbuild.Plugin} */
+const CSSPlugin = {
+  name: "css",
+  setup(build) {
+    build.onResolve({
+      filter: /\.css$/
+    }, (args) => ({
+      path: path.resolve(args.resolveDir, args.path).replace(dirname, ".").replace(/\\/g, "/"),
+      namespace: "css-plugin"
+    }));
+
+    build.onLoad({
+      filter: /.*/, namespace: "css-plugin"
+    }, async (args) => {
+      const css = await readFile(args.path, { encoding: "binary" });
+      
+      return {
+        contents: `
+import { injectCSS } from "common/dom";
+
+injectCSS(
+  ${JSON.stringify("glounza-css-" + args.path)},
+  ${JSON.stringify(css)}
+)
+        `,
+        resolveDir: path.dirname(args.path)
+      }
+    });
+  }
+}
 
 await esbuild.build({
   entryPoints: [ "gluonza/index.tsx" ],
@@ -13,7 +44,7 @@ await esbuild.build({
     "./injections/jsx.js"
   ],
   plugins: [
-    
+    CSSPlugin
   ],
   bundle: true,
   platform: "browser",
@@ -48,7 +79,7 @@ await esbuild.build({
     "./injections/node-require.js"
   ],
   plugins: [
-    
+    CSSPlugin
   ],
   external: [ "electron", "original-fs" ],
   bundle: true,
@@ -66,7 +97,7 @@ await esbuild.build({
     "./injections/node-require.js"
   ],
   plugins: [
-    
+    CSSPlugin
   ],
   external: [ "electron", "original-fs" ],
   bundle: true,
@@ -84,7 +115,7 @@ await esbuild.build({
     "./injections/node-require.js"
   ],
   plugins: [
-    
+    CSSPlugin
   ],
   external: [ "electron", "original-fs" ],
   bundle: true,
