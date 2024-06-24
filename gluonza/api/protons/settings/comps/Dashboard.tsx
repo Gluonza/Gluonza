@@ -351,7 +351,7 @@ const Sidebar: ({onClose, activeTab, setActiveTab}: {
     activeTab: any;
     setActiveTab: any
 }) => JSX.Element = ({ onClose, activeTab, setActiveTab }) => {
-    const internalTabs: string[] = ["Connectivity", "Core", "UI", "Emotes", "Security and Privacy", "CSS Editor","Credits"];
+    const internalTabs: string[] = ["Connectivity", "Core", "UI", "Security and Privacy", "CSS Editor","Credits"];
     const externalTabs: string[] = ["Plugins", "Themes"];
 
     return (
