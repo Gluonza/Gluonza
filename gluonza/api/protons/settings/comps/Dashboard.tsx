@@ -2,9 +2,20 @@
 import {getModule, getProxy, getProxyByKeys, getProxyByStrings, getStore} from "../../../webpack/index.js";
 import {gluonza} from "../../../../window.js";
 import {getPlugins} from "../../../systems/plugins.js";
+import {openWindow} from "../../../window/index.js";
+import {FloatingWindow} from "../../custom-css/editor.js";
+
 const React = proxyCache(() => {
     return window.gluonza.React
 })
+
+export function openFloatingEditor() {
+    openWindow({
+        id: "custom-css",
+        render: FloatingWindow,
+        title: "Custom CSS"
+    })
+}
 
 export const DashboardStyle = `
 :root {
@@ -131,6 +142,7 @@ export const DashboardStyle = `
     font-weight: 600;
     font-size: 12px;
     font-family: Whitney, sans-serif;
+    padding: 10px 0;
 }
 
 .main button {
@@ -442,8 +454,7 @@ const SecurityPrivacyMenu: () => JSX.Element = () => (
 const CSSEditorMenu: () => JSX.Element = () => (
     <div>
         <h5 className="header accent">CSS Editor</h5>
-        <button>Save Changes</button>
-        <p className="hint">Edit your CSS here.</p>
+        <button onClick={() => openFloatingEditor()}>Open External IDE</button>
     </div>
 );
 

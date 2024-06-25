@@ -1,5 +1,6 @@
 ﻿import {coreMods} from "./patches.js";
 import {coreLogger} from "common/consts";
+import {addPlainTextPatch} from "../webpack/index.js";
 
 let plugins: any[] = [];
 
@@ -15,6 +16,17 @@ export function loadPlugins(pluginList: [])
         const module = { exports: {} };
         new Function("module", "exports", "", plugin.source)(module, module.exports, function() { throw "no" });
         plugins.push({manifest: plugin.manifest, source: plugin.source, module: module.exports});
+    })
+    return plugins
+}
+
+export function loadPluginPatches(pluginList: [])
+{
+    pluginList.forEach((plugin: { source: string; manifest: {name: string} }) =>
+    {
+        const module = { exports: {} };
+        new Function("module", "exports", "", plugin.source)(module, module.exports, function() { throw "no" });
+        Array.isArray(module.exports.patches) && addPlainTextPatch(...module.exports.patches)
     })
     return plugins
 }
@@ -96,8 +108,18 @@ window.gluonzaNative.listeners.addListener("pluginChange", async (pluginPath: st
                 exports: {},
                 manifest: JSON.parse(plugin.manifest)
             };
-            new Function("module", "exports", plugin.source)(module, module.exports);
-            reloadPlugin(module, module.exports as { start: () => void; stop: () => void }, false);
+
+            // Wrap plugin source in an IIFE to ensure proper scoping
+            const wrappedSource = `(function(module, exports) { ${plugin.source} })(module, module.exports);`;
+
+            new Function("module", "exports", wrappedSource)(module, module.exports);
+
+            const { start, stop, ...otherExports } = module.exports;
+            if (start && stop) {
+                reloadPlugin(module, { start, stop }, false);
+            } else {
+                reloadPlugin(module, otherExports, false);
+            }
         }
     } catch (error) {
         coreLogger.error(`Failed to process plugin ${pluginPath}:`, error);
