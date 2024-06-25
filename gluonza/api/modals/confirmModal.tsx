@@ -34,7 +34,7 @@ export function openConfirmModal(title: React.ReactNode, content: React.ReactNod
   const modal = openModal((props) => (
     <MegaModule.ConfirmModal
       header={title}
-      className="vx-modals-confirm-modal"
+      className="glounza-modals-confirm-modal"
       confirmText={confirmText}
       onConfirm={() => {
         onConfirm();
@@ -53,7 +53,7 @@ export function openConfirmModal(title: React.ReactNode, content: React.ReactNod
       transitionState={props.transitionState}
       onClose={() => {}}
     >
-      {transformContent(content, "vx-modal-line")}
+      {transformContent(content, "glounza-modal-line")}
     </MegaModule.ConfirmModal>
   ), {
     contextKey,

@@ -44,9 +44,9 @@ function createElement(type, props, children) {
 	}
 
 	let owner = null;
-	// if (typeof window.VX === "object" && VX.util.reactExists) {
-	// 	owner = VX.React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner.current;
-	// }
+	if (typeof window.glounza === "object" && window.glounza.React) {
+		owner = window.glounza.React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner.current;
+	}
 
 	return {
 		$$typeof: Symbol.for("react.element"),

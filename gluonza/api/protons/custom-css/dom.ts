@@ -1,9 +1,10 @@
 import { waitForNode } from "common/dom";
-import { SnippetType, getSnippets } from "./store";
+import { Snippet, SnippetType, getSnippets } from "./store";
 import { compileLess } from "./less";
 import { compileSass } from "./sass";
+import { createAbort } from "../../../util";
 
-const head = document.createElement("glounza-head");
+const head = document.createElement("glounza-custom-css-head");
 
 const cache: Record<SnippetType, Record<string, string | Error>> = {
   css: {},
@@ -46,19 +47,40 @@ export async function compile(type: SnippetType, content: string): Promise<strin
   }
 }
 
-for (const snippets of getSnippets()) {
-  if (!snippets.enabled) continue;
+const undo: Record<string, () => void> = {};
 
-  compile(snippets.type, snippets.content).then((css) => {
-    const style = document.createElement("style");
-    style.setAttribute("data-snippet-type", snippets.type);
-    style.setAttribute("data-snippet", snippets.id);
+export function initSnippet(snippet: Snippet) {
+  if (snippet.id in undo) return undo[snippet.id]();
 
-    if (typeof css === "string") style.textContent = css;
-    else style.setAttribute("data-snippet-error", "");
+  const [ abort, getSignal ] = createAbort();
 
-    head.append(style);
-  });
+  function insertCSS() {
+    abort();
+
+    compile(snippet.type, snippet.content).then((css) => {
+      if (!snippet.enabled) return;
+
+      const signal = getSignal();
+      if (signal.aborted) return;
+
+      const style = document.createElement("style");
+      style.setAttribute("data-snippet-type", snippet.type);
+      style.setAttribute("data-snippet", snippet.id);
+
+      if (typeof css === "string") style.textContent = css;
+      else style.setAttribute("data-snippet-error", "");
+
+      head.append(style);
+
+      signal.addEventListener("abort", () => style.remove());
+    });
+  }
+
+  undo[snippet.id] = insertCSS;
+
+  insertCSS();
 }
 
-waitForNode("head").then(() => document.head.append(head));
+for (const snippet of getSnippets()) initSnippet(snippet);
+
+waitForNode(".drag-previewer").then(() => document.body.append(head));

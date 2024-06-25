@@ -1,10 +1,12 @@
 import { React } from "../../webpack/common";
 import { loadAce } from "./ace";
 import { className, createAbort } from "../../../util";
-import { Snippet, createNewSnippet, updateSnippets, useSnippets } from "./store";
+import { Snippet, SnippetType, createNewSnippet, updateSnippets, useSnippets } from "./store";
 import { MenuComponents, MenuRenderProps, closeMenu, openMenu } from "../../context-menu";
 import { openConfirmModal } from "../../modals";
-import { compile } from "./dom";
+import { compile, initSnippet } from "./dom";
+import { Markdown } from "../../../markdown";
+import { getProxyByKeys } from "../../webpack";
 
 function CSSLogo({ className }: { className?: string }) {
   const props = className ? { className } : { className: "tabbar-icon", width: 30, height: 30 };
@@ -77,16 +79,57 @@ function LessLogo({ className }: { className?: string }) {
   )
 }
 
-function createSnippetSubMenu(snippet: Snippet, toggle: () => void) {
+const MegaModule = getProxyByKeys([ "Anchor" ]);
+
+const types: SnippetType[] = [ "css", "scss", "sass", "less" ];
+
+function createSnippetSubMenu(snippet: Snippet, toggle: () => void, updateLangage: (type: SnippetType) => void) {
+  const [ name, setName ] = React.useState(snippet.name);
   const isDefault = snippet.id === "css" || snippet.id === "less" || snippet.id === "scss" || snippet.id === "sass";
 
   return (
-    <MenuComponents.MenuGroup label={snippet.name} key={snippet.id}>
+    <MenuComponents.MenuGroup key={snippet.id}>
       {!isDefault && (
-        <MenuComponents.MenuItem 
-          id="rename"
-          label="Rename"
-        />
+        <>
+          <MenuComponents.MenuControlItem 
+            id="rename"
+            control={(props, ref) => (
+              <MegaModule.TextInput 
+                value={name}
+                placeholder={snippet.id}
+                onChange={setName}
+                onBlur={() => {
+                  if (!name) return setName(snippet.name);
+
+                  snippet.name = name;
+                  updateSnippets();
+                }}
+                size={MegaModule.TextInput.Sizes.MINI}
+                autoFocus
+              />
+            )}
+          />
+          <MenuComponents.MenuItem id="type" label="Type">
+            <MenuComponents.MenuGroup label="Snippet Type">
+              {types.map((type) => (
+                <MenuComponents.MenuRadioItem
+                  id={type}
+                  key={type}
+                  label={type}
+                  group="type"
+                  checked={snippet.type === type}
+                  action={() => {
+                    snippet.type = type;
+                    updateSnippets();
+                    updateLangage(type);
+                    initSnippet(snippet);
+                  }}
+                />
+              ))}
+            </MenuComponents.MenuGroup>
+          </MenuComponents.MenuItem>
+          <MenuComponents.MenuSeparator />
+        </>
       )}
       <MenuComponents.MenuCheckboxItem 
         id="enabled"
@@ -111,7 +154,11 @@ function createSnippetSubMenu(snippet: Snippet, toggle: () => void) {
         action={async () => {
           const css = await compile(snippet.type, snippet.content);
           
-          openConfirmModal("CSS", [ typeof css === "string" ? css : css.message ], {
+          openConfirmModal("CSS", [
+            <div style={{ userSelect: "text" }}>
+              <Markdown text={`${"```"}css\n${typeof css === "string" ? css : css.message}\n${"```"}`} />
+            </div>
+          ], {
             contextKey: "popout"
           })
         }}
@@ -130,7 +177,7 @@ function createSnippetSubMenu(snippet: Snippet, toggle: () => void) {
   )
 }
 
-function Tab({ snippet, selected, onSelect, onClose }: { snippet: Snippet, selected: boolean, onSelect: () => void, onClose: () => void }) {
+function Tab({ snippet, selected, onSelect, onClose, updateLangage }: { snippet: Snippet, selected: boolean, onSelect: () => void, onClose: () => void, updateLangage: (type: SnippetType) => void }) {
   if (!snippet.visible) return;
 
   return (
@@ -150,7 +197,7 @@ function Tab({ snippet, selected, onSelect, onClose }: { snippet: Snippet, selec
                 if (snippet.visible) return onClose();
                 snippet.visible = true;
                 updateSnippets();
-              })}
+              }, updateLangage)}
             </MenuComponents.Menu>
           );
         })
@@ -181,7 +228,7 @@ function Tab({ snippet, selected, onSelect, onClose }: { snippet: Snippet, selec
   )
 }
 
-function NewMenu(props: MenuRenderProps & { toggleSnippet(index: number): void }) {
+function NewMenu(props: MenuRenderProps & { toggleSnippet(index: number): void, updateLangage: (type: SnippetType) => void }) {
   const [ query, setQuery ] = React.useState("");
   const snippets = useSnippets();
 
@@ -241,7 +288,7 @@ function NewMenu(props: MenuRenderProps & { toggleSnippet(index: number): void }
           key={index}
           icon={snippet.type === "css" ? CSSLogo : snippet.type === "less" ? LessLogo : SassLogo}
         >
-          {createSnippetSubMenu(snippet, () => props.toggleSnippet(index))}
+          {createSnippetSubMenu(snippet, () => props.toggleSnippet(index), updateSnippets)}
         </MenuComponents.MenuItem>
       ))}
     </MenuComponents.Menu>
@@ -384,6 +431,8 @@ export function FloatingWindow({ window }: { window: Window & typeof globalThis 
       
       checkValidityOfCSS();
 
+      initSnippet(snippet);
+
       updateSnippets();
     }
   }
@@ -451,6 +500,7 @@ export function FloatingWindow({ window }: { window: Window & typeof globalThis 
             selected={index === selected}
             onSelect={() => selectTab(index)} 
             onClose={() => hideSnippet(index)}
+            updateLangage={(type) => editorRef.current?.session.setMode(`ace/mode/${type}`)}
             key={index} 
           />
         ))}
@@ -464,7 +514,8 @@ export function FloatingWindow({ window }: { window: Window & typeof globalThis 
                   if (snippets[index].visible) return hideSnippet(index);
                   snippets[index].visible = true;
                   updateSnippets();
-                }} 
+                }}
+                updateLangage={(type) => editorRef.current?.session.setMode(`ace/mode/${type}`)} 
               />
             ))
           }}
