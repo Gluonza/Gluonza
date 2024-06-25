@@ -27,7 +27,8 @@ export class LoadingScreen {
         "Patience you must have, my young padawan.",
         "Our servers are in a yoga class, stretching it out.",
         "These quotes mean actually nothing. What means to us is you using Gluonza <3",
-        "5T3AL!NG Y0UR T0K3N"
+        "5T3AL!NG Y0UR T0K3N",
+        "\"Why are my PNG's not PNG-ing\" - Skye"
     ];
 
     init() {
