@@ -205,3 +205,15 @@ export function getComponentType<P>(component: string | React.ComponentType<P> |
 
   return component as React.ComponentType<P> | string;
 }
+
+export function createAbort(): readonly [ abort: (reason?: any) => void, getSignal: () => AbortSignal ] {
+  let controller = new AbortController();
+
+  function abort(reason?: any) {
+    controller.abort(reason);
+
+    controller = new AbortController();
+  }
+
+  return [ abort, () => controller.signal ];
+}

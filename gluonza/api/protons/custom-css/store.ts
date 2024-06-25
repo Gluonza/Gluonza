@@ -1,3 +1,4 @@
+import { React } from "../../webpack/common";
 import { compileLess } from "./less";
 import { compileSass } from "./sass";
 
@@ -8,7 +9,8 @@ export interface Snippet {
   content: string,
   enabled: boolean,
   type: SnippetType,
-  id: string
+  id: string,
+  visible: boolean
 }
 
 interface StorageType {
@@ -24,79 +26,86 @@ export function getSnippets(): Snippet[] {
     name: "Custom CSS",
     content: "/* default CSS */\n",
     enabled: true,
-    id: "default",
-    type: "css"
+    id: "css",
+    type: "css",
+    visible: true
   }
   storage.snippets.scss ??= {
     name: "Custom SCSS",
     content: "/* default SCSS */\n",
     enabled: true,
-    id: "default",
-    type: "scss"
+    id: "scss",
+    type: "scss",
+    visible: true
   }
   storage.snippets.sass ??= {
     name: "Custom SASS",
     content: "/* default SASS */\n",
     enabled: true,
-    id: "default",
-    type: "sass"
+    id: "sass",
+    type: "sass",
+    visible: true
   }
   storage.snippets.less ??= {
     name: "Custom less",
     content: "/* default less */\n",
     enabled: true,
-    id: "default",
-    type: "less"
+    id: "less",
+    type: "less",
+    visible: true
   }
 
-  return Object.values(storage.snippets);
+  const values = Object.values(storage.snippets);
+
+  const index = values.findIndex((snippet) => snippet.id === "css");
+
+  values.splice(index, 1);
+
+  storage.snippets.css.visible = true;
+
+  return [ storage.snippets.css, ...values ];
+}
+
+const listeners = new Set<() => void>();
+
+export function useSnippets() {
+  const [ state, setState ] = React.useState(() => getSnippets());
+
+  React.useEffect(() => {
+    const onStorageChange = () => setState(() => getSnippets());
+
+    onStorageChange();
+
+    listeners.add(onStorageChange);
+    return () => void listeners.delete(onStorageChange);
+  }, [ ]);
+
+  return state;
 }
 
 export function getSnippet(id: string) {
   return storage.snippets[id];
 }
 
-export function getSnippetCSS(id: string) {
-  return new Promise(async (resolve, reject) => {
-    const snippet = storage.snippets[id]
-
-    if (snippet.type === "css") return resolve(snippet.content);
-
-    if (snippet.type === "less") {
-      try {
-        resolve(await compileLess(snippet.content));
-      }
-      catch (error) {
-        reject(error);
-      }
-      return;
-    }
-
-    try {
-      resolve(
-        await compileSass(snippet.content, snippet.type === "scss")
-      );
-    }
-    catch (error) {
-      reject(error);
-    }
-  })
-}
-
 export function updateSnippets() {
   window.gluonzaNative.storage.write("glounza.custom-css", storage);
+  
+  for (const iterator of listeners) iterator();
 }
 
 export function createNewSnippet(type: SnippetType): Snippet {
+  const id = Date.now().toString(32);
+
   const snippet: Snippet = {
-    name: "New Snippet",
+    name: id,
     content: `/* Insert ${type} */\n`,
-    id: Date.now().toString(32),
+    id: id,
     enabled: true,
-    type
+    type,
+    visible: true
   }
 
-  storage.snippets[snippet.id] = snippet;
+  storage.snippets[id] = snippet;
 
   updateSnippets();
 

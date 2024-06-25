@@ -50,14 +50,17 @@ export function byStrings(...strings: string[]): Webpack.ExportedOnlyFilter {
     catch (error) {}
   }
 }
-export function getByStrings<T extends Record<PropertyKey, any>>(strings: string, opts?: Webpack.FilterOptions) {
+export function getByStrings<T extends Record<PropertyKey, any>>(strings: string[] | string, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(strings)) strings = [ strings ];
   return getModule<T>(byStrings(...strings), opts);
 }
-export function getProxyByStrings<T extends Record<PropertyKey, any>>(keys: string[], opts?: Webpack.FilterOptions) {
-  return getProxy<T>(byStrings(...keys), opts);
+export function getProxyByStrings<T extends Record<PropertyKey, any>>(strings: string[] | string, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(strings)) strings = [ strings ];
+  return getProxy<T>(byStrings(...strings), opts);
 }
-export function getLazyByStrings<T extends Record<PropertyKey, any>>(keys: string[], opts?: Webpack.FilterOptions) {
-  return getLazy<T>(byStrings(...keys), opts);
+export function getLazyByStrings<T extends Record<PropertyKey, any>>(strings: string[] | string, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(strings)) strings = [ strings ];
+  return getLazy<T>(byStrings(...strings), opts);
 }
 
 export function byRegex(...regexes: RegExp[]): Webpack.ExportedOnlyFilter {
@@ -74,13 +77,16 @@ export function byRegex(...regexes: RegExp[]): Webpack.ExportedOnlyFilter {
     catch (error) {}
   }
 }
-export function getByRegex<T extends Record<PropertyKey, any>>(regexes: RegExp[], opts?: Webpack.FilterOptions) {
+export function getByRegex<T extends Record<PropertyKey, any>>(regexes: RegExp[] | RegExp, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(regexes)) regexes = [ regexes ];
   return getModule<T>(byRegex(...regexes), opts);
 }
-export function getProxyByRegex<T extends Record<PropertyKey, any>>(regexes: RegExp[], opts?: Webpack.FilterOptions) {
+export function getProxyByRegex<T extends Record<PropertyKey, any>>(regexes: RegExp[] | RegExp, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(regexes)) regexes = [ regexes ];
   return getProxy<T>(byRegex(...regexes), opts);
 }
-export function getLazyByRegex<T extends Record<PropertyKey, any>>(regexes: RegExp[], opts?: Webpack.FilterOptions) {
+export function getLazyByRegex<T extends Record<PropertyKey, any>>(regexes: RegExp[] | RegExp, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(regexes)) regexes = [ regexes ];
   return getLazy<T>(byRegex(...regexes), opts);
 }
 
@@ -95,13 +101,16 @@ export function byKeys(...keys: string[]): Webpack.ExportedOnlyFilter {
     return true;
   }
 }
-export function getByKeys<T extends Record<PropertyKey, any>>(keys: string[], opts?: Webpack.FilterOptions) {
+export function getByKeys<T extends Record<PropertyKey, any>>(keys: string[] | string, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(keys)) keys = [ keys ];
   return getModule<T>(byKeys(...keys), opts);
 }
-export function getProxyByKeys<T extends Record<PropertyKey, any>>(keys: string[], opts?: Webpack.FilterOptions) {
+export function getProxyByKeys<T extends Record<PropertyKey, any>>(keys: string[] | string, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(keys)) keys = [ keys ];
   return getProxy<T>(byKeys(...keys), opts);
 }
-export function getLazyByKeys<T extends Record<PropertyKey, any>>(keys: string[], opts?: Webpack.FilterOptions) {
+export function getLazyByKeys<T extends Record<PropertyKey, any>>(keys: string[] | string, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(keys)) keys = [ keys ];
   return getLazy<T>(byKeys(...keys), opts);
 }
 
@@ -115,12 +124,15 @@ export function byProtoKeys(...keys: string[]): Webpack.ExportedOnlyFilter {
     return filter(exports.prototype);
   }
 }
-export function getByProtoKeys<T extends Record<PropertyKey, any>>(keys: string[], opts?: Webpack.FilterOptions) {
+export function getByProtoKeys<T extends Record<PropertyKey, any>>(keys: string[] | string, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(keys)) keys = [ keys ];
   return getModule<T>(byProtoKeys(...keys), opts);
 }
-export function getProxyByProtoKeys<T extends Record<PropertyKey, any>>(keys: string[], opts?: Webpack.FilterOptions) {
+export function getProxyByProtoKeys<T extends Record<PropertyKey, any>>(keys: string[] | string, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(keys)) keys = [ keys ];
   return getProxy<T>(byProtoKeys(...keys), opts);
 }
-export function getLazyByProtoKeys<T extends Record<PropertyKey, any>>(keys: string[], opts?: Webpack.FilterOptions) {
+export function getLazyByProtoKeys<T extends Record<PropertyKey, any>>(keys: string[] | string, opts?: Webpack.FilterOptions) {
+  if (!Array.isArray(keys)) keys = [ keys ];
   return getLazy<T>(byProtoKeys(...keys), opts);
 }

@@ -47,12 +47,54 @@ declare module Webpack {
   type AppObject = Array<ModuleWithoutEffect | ModuleWithEffect>;
 };
 
+declare module Sass {
+  interface ErrorResult {
+    status: 1,
+    file: "stdin",
+
+    column: number,
+    line: number,
+    
+    message: string
+    formatted: string,
+  }
+  
+  interface Result {
+    status: 0,
+    files: [],
+    map: { version: number, file: "stdout", sourceRoot: "root", sources: [ "stdin" ], sourcesContent: [ string ], mappings: string },
+    text: string | null
+  }
+
+  interface Options {
+    style: number, 
+    indentedSyntax: boolean
+  }
+
+  interface Sass {
+    style: Record<string, number>,
+    compile(text: string, options: Options, callback: (data: Result | ErrorResult) => void): void  
+  }
+}
+
+declare module Less {
+  interface Result {
+    css: string
+  }
+
+  interface Less {
+    render(less: string): Promise<Result>
+  }
+}
+
 type gluonzaGlobal = typeof import("../gluonza/window")["gluonza"];
 
 interface DiscordWindow {
   webpackChunkdiscord_app?: Webpack.AppObject,
   gluonza: typeof import("../gluonza/window")["gluonza"],
   gluonzaNative: typeof import("../desktop/renderer/native")["gluonzaNative"],
+  Sass?: Sass.Sass,
+  less?: Less.Less,
   // DiscordNative?: DiscordNative
 }
 

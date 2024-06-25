@@ -1,10 +1,9 @@
 import { getProxyByKeys } from "../webpack";
 
 interface IconProps {
-  width?: React.CSSProperties["width"],
-  height?: React.CSSProperties["height"],
-  color?: React.CSSProperties["color"],
-  className?: string
+  isFocused: boolean,
+  color: React.CSSProperties["color"],
+  className: string
 };
 
 const MegaModule = getProxyByKeys([ "Anchor" ]);

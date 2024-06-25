@@ -20,7 +20,7 @@ export function compileSass(text: string, scss = true) {
       await promise;
 
       window.Sass!.compile(text, { 
-        indentedSyntax: scss, 
+        indentedSyntax: !scss, 
         style: window.Sass!.style.nested 
       }, (data) => {
         if (data.status === 1) return reject(new Error(data.message));
