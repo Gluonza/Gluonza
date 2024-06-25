@@ -24,10 +24,6 @@ ipcMain.handle("@gluonza/open-path", (event, { p }) => {
   return { status: 'success' };
 });
 
-ipcMain.handle('update-plugins', (event, pluginPath) => {
-  
-});
-
 const isValidFilePath = (filepath) => {
   const validDirectory = path.join(app.getPath('appData'),MOD_NAME);
   const resolvedPath = path.resolve(filepath);

@@ -277,6 +277,11 @@ export const DashboardStyle = `
     background: #6873c8;
     color: white;
     padding: 3px;
+    &:hover {background-color: #5d69c4;}
+    &.trash {
+        background-color: #f23f42;
+        &:hover {background-color: #f13134;}
+    }
 }
 .gluonza_addon_button:first-of-type {
     border-radius: 3px 0 0 3px;
@@ -593,9 +598,28 @@ async function sleep(timeout: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
+function useForceUpdate() {
+    const [, setState] = React.useState(0);
+    return () => setState((s) => s + 1);
+}
+
 export const MainDashboard: ({onClose}: { onClose: any }) => JSX.Element = ({ onClose }) => {
     const [activeTab, setActiveTab] = React.useState("Connectivity");
     const [closing, setClosing] = React.useState(false);
+    const forceUpdate = useForceUpdate();
+    
+    React.useEffect(() => {
+        function listener() {
+            console.log('Updated')
+            forceUpdate();
+        }
+
+        window.gluonzaNative.listeners.addListener("pluginAfterChange", listener);
+
+        return () => {
+            window.gluonzaNative.listeners.removeListener("pluginAfterChange", listener);
+        };
+    }, []);
     
     const handleClose = async () =>
     {
