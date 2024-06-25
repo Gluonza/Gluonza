@@ -112,9 +112,9 @@ export function injectCSS(id: string, css: string | null) {
     style.textContent = css;
 
     let removed = false;
-    waitForNode("head").then(() => {
+    waitForNode("body").then(() => {
         if (removed) return;
-        document.head.appendChild(style);
+        document.body.appendChild(style);
     });
 
     return () => {
