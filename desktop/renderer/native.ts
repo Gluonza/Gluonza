@@ -77,7 +77,7 @@ function getNativeThemes()
                     logWarning(
                         dir,
                         `Manifest is missing the following properties: { ${missingManifestFields.join(', ')} }; ` +
-                        (missingManifestFields.includes('name')
+                        (missingManifestFields.includes('id')
                             ? 'Ignoring. '
                             : 'Loading.')
                     );
@@ -116,7 +116,7 @@ function getNativePlugins() {
                         logWarning(
                             dir,
                             `Manifest is missing the following properties: { ${missingManifestFields.join(', ')} }; ` +
-                            (missingManifestFields.includes('name')
+                            (missingManifestFields.includes('id')
                                 ? 'Ignoring. '
                                 : 'Loading.')
                         );
