@@ -1,21 +1,28 @@
-﻿import {proxyCache} from "../../../../util.js";
-import {getModule, getProxy, getProxyByKeys, getProxyByStrings, getStore} from "../../../webpack/index.js";
-import {gluonza} from "../../../../window.js";
-import {getPlugins} from "../../../systems/plugins.js";
-import {openWindow} from "../../../window/index.js";
-import {FloatingWindow} from "../../custom-css/editor.js";
-import {getThemes} from "../../../systems/themes.js";
+﻿import { proxyCache } from "../../../../util.js";
+import {
+    getByStrings,
+    getModule,
+    getProxy,
+    getProxyByKeys,
+    getProxyByStrings,
+    getStore
+} from "../../../webpack/index.js";
+import { gluonza } from "../../../../window.js";
+import { getPlugins, startPlugin, stopPlugin } from "../../../systems/plugins.js";
+import { openWindow } from "../../../window/index.js";
+import { FloatingWindow } from "../../custom-css/editor.js";
+import {getThemes, startThemes, disableTheme, startTheme} from "../../../systems/themes.js";
 
 const React = proxyCache(() => {
-    return window.gluonza.React
-})
+    return window.gluonza.React;
+});
 
 export function openFloatingEditor() {
     openWindow({
         id: "custom-css",
         render: FloatingWindow,
         title: "Custom CSS"
-    })
+    });
 }
 
 export const DashboardStyle = `
@@ -70,7 +77,7 @@ export const DashboardStyle = `
 }
 
 .sidebar {
-    width: 300px; /* idk what width you set it to */
+    width: 300px;
     z-index: 3001;
     background-color: #292b2f;
     padding: 20px 15px 0;
@@ -80,7 +87,7 @@ export const DashboardStyle = `
 
 .sidebar .logo {
     background: url('https://cdn.discordapp.com/attachments/1128887206476513420/1254141344964808744/Gluonza.png?ex=667869a5&is=66771825&hm=e646e5417470663f34f9c510ee2c2c0a8dff27a842cebde18901570ab5bc846e&') center/cover;
-} /* Once this link runs off the ex tag. Ill replace it with a Github link. Thankies pastel love */
+}
 
 .sidebar .header {
     padding: 6px 0;
@@ -249,7 +256,7 @@ export const DashboardStyle = `
     display: flex;
     width: 100%;
     justify-content: space-evenly;
-    font-family: Whitney,  sans-serif;
+    font-family: Whitney, sans-serif;
 }
 .tabs .local, .tabs .online {
     color: #b9bbbe;
@@ -262,7 +269,7 @@ export const DashboardStyle = `
 
 .gluonza_card {
     padding: 16px;
-    font-family: Whitney,  sans-serif;
+    font-family: Whitney, sans-serif;
 }
 .gluonza_addon_header {
     display: flex; 
@@ -314,11 +321,11 @@ interface SettingsTabProps {
     onClick: () => void;
 }
 
-const CloseButton: JSX.Element = proxyCache( () => {
-    return getModule(x=>x.Z && x.default.Variants)
-})
+const CloseButton: JSX.Element = proxyCache(() => {
+    return getModule(x => x.Z && x.default.Variants);
+});
 
-const Components = getProxyByKeys([ "Anchor" ]);
+const Components = getProxyByKeys(["Anchor"]);
 
 const Tab = ({ labels, selectedTab, onSelectTab }) => {
     return (
@@ -336,11 +343,28 @@ const Tab = ({ labels, selectedTab, onSelectTab }) => {
     );
 };
 
-const Switch = getProxy(() => {
-    return getProxyByStrings([ "xMinYMid meet" ]);
-})
+const Yeah = getProxyByKeys(['Switch']) // Switch Component
 
-const Card = ({ icon, name, description, version, authors, onEdit, onSettings, onRefresh, onDelete }) => {
+interface SwitchProps {
+    isChecked: boolean;
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const Switch: React.FC<SwitchProps> = ({ isChecked, onChange }) => {
+    return (
+        <Yeah.Switch
+            className={'gluonza_addon_switch'}
+            checked={isChecked}
+            onChange={onChange}
+        />
+    );
+};
+
+export default Switch;
+
+
+
+const Card = ({ icon, name, description, version, authors, onEdit, onSettings, onRefresh, onDelete, addon }) => {
     const buttons = [
         { label: "✏️", onClick: onEdit },
         { label: "⚙️", onClick: onSettings },
@@ -350,17 +374,28 @@ const Card = ({ icon, name, description, version, authors, onEdit, onSettings, o
 
     const titleStyle = icon == undefined ? { marginLeft: '0px !important' } : {};
 
+    const [isSwitchChecked, setSwitchChecked] = React.useState(addon.started);
+
+    const handleSwitchChange = () => {
+        setSwitchChecked(!isSwitchChecked);
+        if (isSwitchChecked) {
+            addon.manifest.id ? stopPlugin(addon.manifest.id) : disableTheme(addon.manifest.id);
+        } else {
+            addon.manifest.id ? startPlugin(addon.manifest.id) : startTheme(addon.manifest.id);
+        }
+    };
+
     return (
         <div className="gluonza_card">
             <div className="gluonza_addon_header">
-                {icon !== undefined && <img src={icon} width="32" alt="Icon"/>}
+                {icon !== undefined && <img src={icon} width="32" alt="Icon" />}
                 <div className="gluonza_addon_title" style={titleStyle}>{name}</div>
-                <Switch className="gluonza_addon_switch">switch</Switch>
+                <Switch isChecked={isSwitchChecked} onChange={handleSwitchChange} />
             </div>
             <div className="gluonza_addon_description">{description}</div>
             <div className="gluonza_addon_footer">
                 <span>{version}</span>
-                <span>&nbspby&nbsp</span>
+                <span>&nbsp;by&nbsp;</span>
                 <span>{authors?.join?.(', ')}</span>
                 <div className="gluonza_addon_controls">
                     {buttons.map((button, index) => (
@@ -372,12 +407,7 @@ const Card = ({ icon, name, description, version, authors, onEdit, onSettings, o
     );
 };
 
-
-const SettingsTab: ({name, active, onClick}: { name: any; active: any; onClick: any }) => JSX.Element = ({
-     name,
-     active,
-     onClick
- }) => {
+const SettingsTab = ({ name, active, onClick }: SettingsTabProps) => {
     return (
         <div className={`settings_tab ${active ? 'active' : ''}`} onClick={onClick}>{name}</div>
     );
@@ -424,6 +454,7 @@ const CreditsScreen = () => {
                 <ul>
                     {credits.map((credit, index) => (
                         <CreditItem
+                            key={index}
                             imgSrc={credit.imgSrc}
                             altText={credit.altText}
                             name={credit.name}
@@ -482,19 +513,19 @@ const PluginsMenu = () => {
         <div>
             <h5 className="header accent">Plugin Settings</h5>
             <Components.Clickable onClick={() => {
-                window.gluonzaNative.app.openPath('plugins')
-            }} style={{justifyContent: 'center', alignItems: 'center', alignSelf: 'center'}}>
-                <FolderSVG/>
+                window.gluonzaNative.app.openPath('plugins');
+            }} style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
+                <FolderSVG />
             </Components.Clickable>
             <div className="cards-container">
                 {plugins.map((plugin, index) => (
                     <React.Fragment key={index}>
-                        <Card
-                            {...plugin.manifest}
-                            onEdit={() => handleEdit(plugin)}
-                            onSettings={() => handleSettings(plugin)}
-                            onRefresh={() => handleRefresh(plugin)}
-                            onDelete={() => handleDelete(plugin)}
+                        <Card addon={plugin}
+                              {...plugin.manifest}
+                              onEdit={() => handleEdit(plugin)}
+                              onSettings={() => handleSettings(plugin)}
+                              onRefresh={() => handleRefresh(plugin)}
+                              onDelete={() => handleDelete(plugin)}
                         />
                         <div className="gluonza_addon_divider"></div>
                     </React.Fragment>
@@ -502,62 +533,61 @@ const PluginsMenu = () => {
             </div>
             <p className="hint">Manage your plugins here.</p>
         </div>
-    )
-}
-
+    );
+};
 
 const FolderSVG: () => JSX.Element = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-        <rect x="3" y="8" width="14" height="4" rx="2" ry="1" fill="#ebc262"/>
-        <rect x="3" y="10" width="18" height="11" rx="2" ry="2" fill="#F1D592"/>
+        <rect x="3" y="8" width="14" height="4" rx="2" ry="1" fill="#ebc262" />
+        <rect x="3" y="10" width="18" height="11" rx="2" ry="2" fill="#F1D592" />
     </svg>
-)
+);
 
 const ThemesMenu: () => JSX.Element = () => {
 
     const themes = getThemes();
 
-    const handleEdit = (plugin: any) => {
-        console.log("Edit", plugin);
+    const handleEdit = (theme: any) => {
+        console.log("Edit", theme);
     };
 
-    const handleSettings = (plugin) => {
-        console.log("Settings", plugin);
+    const handleSettings = (theme) => {
+        console.log("Settings", theme);
     };
 
-    const handleRefresh = (plugin) => {
-        console.log("Refresh", plugin);
+    const handleRefresh = (theme) => {
+        console.log("Refresh", theme);
     };
 
-    const handleDelete = (plugin) => {
-        console.log("Delete", plugin);
+    const handleDelete = (theme) => {
+        console.log("Delete", theme);
     };
 
     return (
         <div>
-            <h5 className="header accent">Plugin Settings</h5>
+            <h5 className="header accent">Theme Settings</h5>
             <Components.Clickable onClick={() => {
-                window.gluonzaNative.app.openPath('plugins')
-            }} style={{justifyContent: 'center', alignItems: 'center', alignSelf: 'center'}}>
-                <FolderSVG/>
+                window.gluonzaNative.app.openPath('themes');
+            }} style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
+                <FolderSVG />
             </Components.Clickable>
             <div className="cards-container">
-                {themes.map((plugin, index) => (
+                {themes.map((theme, index) => (
                     <React.Fragment key={index}>
-                        <Card
-                            {...plugin.manifest}
-                            onEdit={() => handleEdit(plugin)}
-                            onSettings={() => handleSettings(plugin)}
-                            onRefresh={() => handleRefresh(plugin)}
-                            onDelete={() => handleDelete(plugin)}
+                        <Card addon={theme}
+                              {...theme.manifest}
+                              onEdit={() => handleEdit(theme)}
+                              onSettings={() => handleSettings(theme)}
+                              onRefresh={() => handleRefresh(theme)}
+                              onDelete={() => handleDelete(theme)}
                         />
                         <div className="gluonza_addon_divider"></div>
                     </React.Fragment>
                 ))}
             </div>
-            <p className="hint">Manage your plugins here.</p>
+            <p className="hint">Manage your themes here.</p>
         </div>
-    )
+    );
 };
 
 interface SidebarProps {
@@ -566,18 +596,14 @@ interface SidebarProps {
     setActiveTab: (tab: string) => void;
 }
 
-const Sidebar: ({onClose, activeTab, setActiveTab}: {
-    onClose: any;
-    activeTab: any;
-    setActiveTab: any
-}) => JSX.Element = ({ onClose, activeTab, setActiveTab }) => {
-    const internalTabs: string[] = ["Connectivity", "Core", "UI", "Security and Privacy", "CSS Editor","Credits"];
+const Sidebar: ({ onClose, activeTab, setActiveTab }: SidebarProps) => JSX.Element = ({ onClose, activeTab, setActiveTab }) => {
+    const internalTabs: string[] = ["Connectivity", "Core", "UI", "Security and Privacy", "CSS Editor", "Credits"];
     const externalTabs: string[] = ["Plugins", "Themes"];
 
     return (
         <div className="sidebar">
-            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                <div className="logo" style={{height: '50px', width: '230px'}}></div>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <div className="logo" style={{ height: '50px', width: '230px' }}></div>
                 <CloseButton.Z className="placeholder" keybind={"ESC"} closeAction={() => { onClose() }} style={{ background: 'red', position: 'absolute', top: '0px', right: '0', padding: '0px', margin: '20px' }}></CloseButton.Z>
             </div>
             <div className="header">Internal</div>
@@ -606,9 +632,9 @@ interface MainProps {
     activeTab: string;
 }
 
-const Main: ({activeTab}: { activeTab: any }) => JSX.Element = ({ activeTab }) => {
+const Main: ({ activeTab }: MainProps) => JSX.Element = ({ activeTab }) => {
     const renderMenu = () => {
-        switch(activeTab) { // I love switches. faster than if statements
+        switch (activeTab) {
             case "Connectivity":
                 return <ConnectivityMenu />;
             case "Core":
@@ -642,24 +668,23 @@ interface MainDashboardProps {
     onClose: () => void;
 }
 
-
 async function sleep(timeout: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
 function useForceUpdate() {
     const [, setState] = React.useState(0);
-    return () => setState((s) => s + 1);
+    return () => setState(s => s + 1);
 }
 
-export const MainDashboard: ({onClose}: { onClose: any }) => JSX.Element = ({ onClose }) => {
+export const MainDashboard: ({ onClose }: MainDashboardProps) => JSX.Element = ({ onClose }) => {
     const [activeTab, setActiveTab] = React.useState("Connectivity");
     const [closing, setClosing] = React.useState(false);
     const forceUpdate = useForceUpdate();
-    
+
     React.useEffect(() => {
         function listener() {
-            console.log('Updated')
+            console.log('Updated');
             forceUpdate();
         }
 
@@ -669,22 +694,19 @@ export const MainDashboard: ({onClose}: { onClose: any }) => JSX.Element = ({ on
             window.gluonzaNative.listeners.removeListener("pluginAfterChange", listener);
         };
     }, []);
-    
-    const handleClose = async () =>
-    {
-        setClosing(true)
-        await sleep(300).then(() => // I don't think this is needed but sure
-        {
+
+    const handleClose = async () => {
+        setClosing(true);
+        await sleep(300).then(() => {
             onClose();
-        })
-    }
-    
+        });
+    };
+
     return (
-        // Closing the window onClose/backdrop click.
         <div className={`app ${closing ? 'closing' : ''}`}>
-            <Sidebar onClose={handleClose} activeTab={activeTab} setActiveTab={setActiveTab}/>
-            <Main activeTab={activeTab}/>
-            <div className="backdrop" onClick={handleClose}/>
+            <Sidebar onClose={handleClose} activeTab={activeTab} setActiveTab={setActiveTab} />
+            <Main activeTab={activeTab} />
+            <div className="backdrop" onClick={handleClose} />
         </div>
     );
 };

@@ -50,7 +50,7 @@ export function byStrings(...strings: string[]): Webpack.ExportedOnlyFilter {
     catch (error) {}
   }
 }
-export function getByStrings<T extends Record<PropertyKey, any>>(strings: string[], opts?: Webpack.FilterOptions) {
+export function getByStrings<T extends Record<PropertyKey, any>>(strings: string, opts?: Webpack.FilterOptions) {
   return getModule<T>(byStrings(...strings), opts);
 }
 export function getProxyByStrings<T extends Record<PropertyKey, any>>(keys: string[], opts?: Webpack.FilterOptions) {

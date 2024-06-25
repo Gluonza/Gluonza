@@ -1,6 +1,6 @@
 ﻿import { coreMods } from "./patches.js";
 import { addPlainTextPatch } from "../webpack/index.js";
-import {coreLogger} from "common/consts.js";
+import { coreLogger } from "common/consts.js";
 
 type Plugin = {
     manifest: {
@@ -12,6 +12,7 @@ type Plugin = {
         stop: () => void;
         [key: string]: any;
     };
+    started: boolean;
 };
 
 type PluginsArray = Plugin[];
@@ -25,22 +26,28 @@ export function getPlugins(): PluginsArray {
 
 export function loadPlugins(pluginList: { source: string; manifest: { name: string; id?: string } }[]): PluginsArray {
     pluginList.forEach((plugin) => {
-        const module = { exports: {} };
-        new Function("module", "exports", "", plugin.source)(module, module.exports, () => { throw "no" });
-        plugins.push({ manifest: plugin.manifest, source: plugin.source, module: module.exports });
+        const module = loadPluginModule(plugin.source);
+        plugins.push({ manifest: plugin.manifest, module, started: false, type: 'plugin' });
     });
     return plugins;
 }
 
 export function loadPluginPatches(pluginList: { source: string; manifest: { name: string; id?: string } }[]): PluginsArray {
     pluginList.forEach((plugin) => {
-        const module = { exports: {} };
-        new Function("module", "exports", "", plugin.source)(module, module.exports, () => { throw "no" });
-        if (Array.isArray(module.exports.patches)) {
-            addPlainTextPatch(...module.exports.patches);
+        const module = loadPluginModule(plugin.source);
+        if (Array.isArray(module.patches)) {
+            addPlainTextPatch(...module.patches);
         }
     });
     return plugins;
+}
+
+function loadPluginModule(source: string) {
+    const module = { exports: {
+            patches: {}
+        } };
+    new Function("module", "exports", "", source)(module, module.exports, () => { throw "no" });
+    return module.exports;
 }
 
 export function startCoreMods(): void {
@@ -49,28 +56,50 @@ export function startCoreMods(): void {
     });
 }
 
-export async function startPlugins(): Promise<void> {
+async function getDisabledPlugins(): Promise<string[]> {
     const { disabled } = await window.gluonzaNative.storage.read('dev.glounza');
-    const disabledArray = Array.isArray(disabled) ? disabled : [];
+    return Array.isArray(disabled) ? disabled : [];
+}
+
+function findPluginById(id: string | undefined) {
+    return plugins.find(plugin => plugin.manifest.id === id);
+}
+
+export function startPlugin(id: string | undefined): void {
+    const plugin = findPluginById(id);
+    if (plugin) {
+        plugin.module?.start();
+        plugin.started = true;
+    }
+}
+
+export function stopPlugin(id: string | undefined): void {
+    const plugin = findPluginById(id);
+    if (plugin) {
+        plugin.module?.stop();
+        plugin.started = false;
+    }
+}
+
+export async function startPlugins(): Promise<void> {
+    const disabledArray = await getDisabledPlugins();
 
     plugins.forEach((plugin) => {
-        if (disabled.includes(plugin.manifest.id)) return
-        
-        plugin.module?.start();
+        if (disabledArray.includes(<string>plugin.manifest.id)) return;
+
+        startPlugin(plugin.manifest.id);
         coreLogger.info(`Started plugin: ${plugin.manifest.id}`);
     });
 }
 
 export async function disablePlugin(pluginId: string): Promise<void> {
-    const { disabled } = await window.gluonzaNative.storage.read('dev.glounza');
-    const disabledArray = Array.isArray(disabled) ? disabled : [];
+    const disabledArray = await getDisabledPlugins();
 
     if (!disabledArray.includes(pluginId)) {
-        const plugin = plugins.find(p => p.manifest.id === pluginId);
+        const plugin = findPluginById(pluginId);
 
         if (plugin) {
-            plugin.module?.stop();
-            coreLogger.info(`Stopped plugin: ${plugin.manifest.id}`);
+            stopPlugin(pluginId);
 
             const updatedDisabled = [...disabledArray, pluginId];
             await window.gluonzaNative.storage.write('dev.glounza', { disabled: updatedDisabled });
@@ -84,7 +113,7 @@ export async function disablePlugin(pluginId: string): Promise<void> {
 }
 
 function reloadPlugin(givenPlugin: { exports: {}; manifest: { id?: string } }, module?: { start: () => void; stop: () => void }, isManifestOnly: boolean = false): void {
-    const plugin = plugins.find(p => p.manifest.id === givenPlugin.manifest.id);
+    const plugin = findPluginById(givenPlugin.manifest.id);
 
     if (plugin) {
         plugin.module?.stop();
@@ -103,7 +132,7 @@ function reloadPlugin(givenPlugin: { exports: {}; manifest: { id?: string } }, m
             plugin.manifest = givenPlugin.manifest;
             plugin.module.start();
         } else {
-            plugins.push({ manifest: givenPlugin.manifest, module });
+            plugins.push({ manifest: givenPlugin.manifest, module, started: false });
             module.start();
         }
     }
