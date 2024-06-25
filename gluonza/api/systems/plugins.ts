@@ -1,72 +1,89 @@
-﻿import {coreMods} from "./patches.js";
-import {coreLogger} from "common/consts";
-import {addPlainTextPatch} from "../webpack/index.js";
-
-let plugins: any[] = [];
-
-export function getPlugins()
-{
-    return plugins;
-}
-
-export function loadPlugins(pluginList: [])
-{
-    pluginList.forEach((plugin: { source: string; manifest: {name: string} }) =>
-    {
-        const module = { exports: {} };
-        new Function("module", "exports", "", plugin.source)(module, module.exports, function() { throw "no" });
-        plugins.push({manifest: plugin.manifest, source: plugin.source, module: module.exports});
-    })
-    return plugins
-}
-
-export function loadPluginPatches(pluginList: [])
-{
-    pluginList.forEach((plugin: { source: string; manifest: {name: string} }) =>
-    {
-        const module = { exports: {} };
-        new Function("module", "exports", "", plugin.source)(module, module.exports, function() { throw "no" });
-        Array.isArray(module.exports.patches) && addPlainTextPatch(...module.exports.patches)
-    })
-    return plugins
-}
-
-export function startCoreMods() {
-    coreMods.forEach(plugin => {
-        plugin.start();
-    })
-}
-
-export function startPlugins() {
-    plugins.forEach(plugin => {
-        plugin?.module?.start();
-        coreLogger.info(`Started plugin: ${plugin.manifest.name}`)
-    })
-}
+﻿import { coreMods } from "./patches.js";
+import { addPlainTextPatch } from "../webpack/index.js";
+import {coreLogger} from "common/consts.js";
 
 type Plugin = {
     manifest: {
         name: string;
+        id?: string;
     };
     module?: {
         start: () => void;
         stop: () => void;
+        [key: string]: any;
     };
 };
 
 type PluginsArray = Plugin[];
 
-declare const plugins: PluginsArray;
+let plugins: PluginsArray = [];
 declare const window: any;
-declare const coreLogger: {
-    info: (message: string) => void;
-    error: (message: string, error: any) => void;
-};
 
-function reloadPlugin(givenPlugin: { exports: {}; manifest: any }, module: {
-    start: () => void;
-    stop: () => void
-} | undefined, isManifestOnly: boolean): void {
+export function getPlugins(): PluginsArray {
+    return plugins;
+}
+
+export function loadPlugins(pluginList: { source: string; manifest: { name: string; id?: string } }[]): PluginsArray {
+    pluginList.forEach((plugin) => {
+        const module = { exports: {} };
+        new Function("module", "exports", "", plugin.source)(module, module.exports, () => { throw "no" });
+        plugins.push({ manifest: plugin.manifest, source: plugin.source, module: module.exports });
+    });
+    return plugins;
+}
+
+export function loadPluginPatches(pluginList: { source: string; manifest: { name: string; id?: string } }[]): PluginsArray {
+    pluginList.forEach((plugin) => {
+        const module = { exports: {} };
+        new Function("module", "exports", "", plugin.source)(module, module.exports, () => { throw "no" });
+        if (Array.isArray(module.exports.patches)) {
+            addPlainTextPatch(...module.exports.patches);
+        }
+    });
+    return plugins;
+}
+
+export function startCoreMods(): void {
+    coreMods.forEach((plugin) => {
+        plugin.start();
+    });
+}
+
+export async function startPlugins(): Promise<void> {
+    const { disabled } = await window.gluonzaNative.storage.read('dev.glounza');
+    const disabledArray = Array.isArray(disabled) ? disabled : [];
+
+    plugins.forEach((plugin) => {
+        if (disabled.includes(plugin.manifest.id)) return
+        
+        plugin.module?.start();
+        coreLogger.info(`Started plugin: ${plugin.manifest.id}`);
+    });
+}
+
+export async function disablePlugin(pluginId: string): Promise<void> {
+    const { disabled } = await window.gluonzaNative.storage.read('dev.glounza');
+    const disabledArray = Array.isArray(disabled) ? disabled : [];
+
+    if (!disabledArray.includes(pluginId)) {
+        const plugin = plugins.find(p => p.manifest.id === pluginId);
+
+        if (plugin) {
+            plugin.module?.stop();
+            coreLogger.info(`Stopped plugin: ${plugin.manifest.id}`);
+
+            const updatedDisabled = [...disabledArray, pluginId];
+            await window.gluonzaNative.storage.write('dev.glounza', { disabled: updatedDisabled });
+            coreLogger.info(`Disabled plugin: ${plugin.manifest.id}`);
+        } else {
+            coreLogger.error(`Plugin with ID ${pluginId} not found`);
+        }
+    } else {
+        coreLogger.info(`Plugin with ID ${pluginId} is already disabled`);
+    }
+}
+
+function reloadPlugin(givenPlugin: { exports: {}; manifest: { id?: string } }, module?: { start: () => void; stop: () => void }, isManifestOnly: boolean = false): void {
     const plugin = plugins.find(p => p.manifest.id === givenPlugin.manifest.id);
 
     if (plugin) {
@@ -83,7 +100,7 @@ function reloadPlugin(givenPlugin: { exports: {}; manifest: any }, module: {
     if (module && typeof module.start === 'function' && typeof module.stop === 'function') {
         if (plugin) {
             plugin.module = module;
-            plugin.manifest = module.manifest;
+            plugin.manifest = givenPlugin.manifest;
             plugin.module.start();
         } else {
             plugins.push({ manifest: givenPlugin.manifest, module });
@@ -106,7 +123,7 @@ window.gluonzaNative.listeners.addListener("pluginChange", async (pluginPath: st
         } else {
             const module = {
                 exports: {},
-                manifest: JSON.parse(plugin.manifest)
+                manifest: JSON.parse(plugin.manifest),
             };
 
             // Wrap plugin source in an IIFE to ensure proper scoping
@@ -125,4 +142,3 @@ window.gluonzaNative.listeners.addListener("pluginChange", async (pluginPath: st
         coreLogger.error(`Failed to process plugin ${pluginPath}:`, error);
     }
 });
-

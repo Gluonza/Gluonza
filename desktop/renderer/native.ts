@@ -37,6 +37,7 @@ function readManifest(manifestPath: fs.PathOrFileDescriptor) {
 
 function getMissingManifestFields(manifest: { name: any; authors: any; description: any; version: any; }) {
     return [
+        !manifest.id && 'id',
         !manifest.name && 'name',
         !manifest.authors && 'authors',
         !manifest.description && 'description',
@@ -46,6 +47,52 @@ function getMissingManifestFields(manifest: { name: any; authors: any; descripti
 
 function logWarning(pluginDir: string, message: string) {
     coreLogger.warn(`${MOD_NAME} -> IPC: ${message} in ${path.join(directories.plugins, pluginDir)}`);
+}
+
+function getNativeThemes()
+{
+    try {
+        const themes = [];
+
+        const themeDirectories = getPluginDirectories(directories.themes);
+        
+        for (const dir of themeDirectories) {
+            const manifestPath = path.join(directories.themes, dir, 'manifest.json');
+            const stylePath = path.join(directories.themes, dir, 'theme.css');
+
+            if (fs.existsSync(manifestPath) && fs.existsSync(stylePath)) {
+                const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+
+                const missingManifestFields = getMissingManifestFields(manifest)
+
+                const source = fs.readFileSync(stylePath, 'utf-8');
+
+                if (!missingManifestFields.includes('id'))
+                    themes.push({
+                        manifest,
+                        source,
+                    });
+
+                if (missingManifestFields.length > 0)
+                    logWarning(
+                        dir,
+                        `Manifest is missing the following properties: { ${missingManifestFields.join(', ')} }; ` +
+                        (missingManifestFields.includes('name')
+                            ? 'Ignoring. '
+                            : 'Loading.')
+                    );
+            }
+            else
+                logWarning(dir, 'manifest.json or theme.css missing. Theme will not load.');
+        }
+
+        return { status: 'success', themes };
+    }
+    catch (error)
+    {
+        console.warn(`${MOD_NAME} -> IPC: Error loading themes:`, error);
+        return { status: 'error', message: (error as Error).message };
+    }
 }
 
 function getNativePlugins() {
@@ -63,7 +110,7 @@ function getNativePlugins() {
                     const source = fs.readFileSync(indexPath, 'utf-8');
                     const missingManifestFields = getMissingManifestFields(manifest);
 
-                    if (!missingManifestFields.includes('name')) plugins.push({manifest, source});
+                    if (!missingManifestFields.includes('id')) plugins.push({manifest, source});
 
                     if (missingManifestFields.length > 0) {
                         logWarning(
@@ -75,7 +122,7 @@ function getNativePlugins() {
                         );
                     }
                 } else {
-                    logWarning(dir, 'manifest.json or index.js missing. Plugin will now not load.');
+                    logWarning(dir, 'manifest.json or index.js missing. Plugin will not load.');
                 }
             } catch (error) {
                 console.warn('error:', error);
@@ -150,7 +197,7 @@ export const gluonzaNative = {
         }
     },
     plugins: {
-        getNativePlugins, read: (filepath: any) => {
+        getNativePlugins, getNativeThemes, read: (filepath: any) => {
             return ipcRenderer.invoke('read-file', {filepath: filepath})
         }
     },

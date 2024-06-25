@@ -4,6 +4,7 @@ import {gluonza} from "../../../../window.js";
 import {getPlugins} from "../../../systems/plugins.js";
 import {openWindow} from "../../../window/index.js";
 import {FloatingWindow} from "../../custom-css/editor.js";
+import {getThemes} from "../../../systems/themes.js";
 
 const React = proxyCache(() => {
     return window.gluonza.React
@@ -512,15 +513,52 @@ const FolderSVG: () => JSX.Element = () => (
     </svg>
 )
 
-const ThemesMenu: () => JSX.Element = () => (
-    <div>
-        <h5 className="header accent">Themes Settings</h5>
-        <Components.Clickable tag={'dick'} onClick={() => {window.gluonzaNative.app.openPath('themes')}} style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
-            <FolderSVG />
-        </Components.Clickable>
-        <p className="hint">Manage your themes here.</p>
-    </div>
-);
+const ThemesMenu: () => JSX.Element = () => {
+
+    const themes = getThemes();
+
+    const handleEdit = (plugin: any) => {
+        console.log("Edit", plugin);
+    };
+
+    const handleSettings = (plugin) => {
+        console.log("Settings", plugin);
+    };
+
+    const handleRefresh = (plugin) => {
+        console.log("Refresh", plugin);
+    };
+
+    const handleDelete = (plugin) => {
+        console.log("Delete", plugin);
+    };
+
+    return (
+        <div>
+            <h5 className="header accent">Plugin Settings</h5>
+            <Components.Clickable onClick={() => {
+                window.gluonzaNative.app.openPath('plugins')
+            }} style={{justifyContent: 'center', alignItems: 'center', alignSelf: 'center'}}>
+                <FolderSVG/>
+            </Components.Clickable>
+            <div className="cards-container">
+                {themes.map((plugin, index) => (
+                    <React.Fragment key={index}>
+                        <Card
+                            {...plugin.manifest}
+                            onEdit={() => handleEdit(plugin)}
+                            onSettings={() => handleSettings(plugin)}
+                            onRefresh={() => handleRefresh(plugin)}
+                            onDelete={() => handleDelete(plugin)}
+                        />
+                        <div className="gluonza_addon_divider"></div>
+                    </React.Fragment>
+                ))}
+            </div>
+            <p className="hint">Manage your plugins here.</p>
+        </div>
+    )
+};
 
 interface SidebarProps {
     onClose: () => void;
