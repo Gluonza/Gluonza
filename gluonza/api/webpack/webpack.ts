@@ -1,6 +1,5 @@
 import {compileFunction, destructuredPromise, escapeRegex, isInvalidSyntax} from "../../util";
 import {plainTextPatches} from "./patches";
-import {startMainPatches} from "../systems/patches.js";
 
 export const webpackAppChunk = window.webpackChunkdiscord_app ??= [];
 
@@ -10,8 +9,6 @@ const webpackInit = destructuredPromise();
 export function whenWebpackInit() {
   return webpackInit.promise;
 }
-
-startMainPatches();
 
 webpackAppChunk.push([
   [ Symbol.for("gluonza") ],

@@ -164,3 +164,44 @@ export function createStateLike<T>(defaultValue: T): StateLike<T> {
 
   return [getState, setState, useState] as const;
 }
+
+
+interface classNameValueTypes {
+  array: Array<string | void | false | classNameValueTypes["object"]>
+  object: Record<string, boolean>
+};
+
+export function className(classNames: classNameValueTypes["array"] | classNameValueTypes["object"]) {
+  if (!Array.isArray(classNames)) classNames = [ classNames ];
+  
+  function parseString(className: string) {
+    return className.split(" ").filter(Boolean).join(" ");
+  }
+
+  const flattenedString: string[] = [];
+  for (const className of classNames) {
+    if (!className) continue;
+
+    if (typeof className === "string") {
+      flattenedString.push(parseString(className));
+      continue;
+    }
+
+    for (const key in className) {
+      if (Object.prototype.hasOwnProperty.call(className, key)) {
+        if (className[key]) flattenedString.push(parseString(key));
+      }
+    }
+  }
+
+  return Array.from(new Set(flattenedString)).join(" ");
+};
+
+export function getComponentType<P>(component: string | React.ComponentType<P> | React.MemoExoticComponent<React.ComponentType<P>> | React.ForwardRefExoticComponent<P>): React.ComponentType<P> | string {
+  if (component instanceof Object && "$$typeof" in component) {
+    if (component.$$typeof === Symbol.for("react.memo")) return getComponentType<P>((component as any).type);
+    if (component.$$typeof === Symbol.for("react.forward_ref")) return getComponentType<P>((component as any).render);
+  }
+
+  return component as React.ComponentType<P> | string;
+}

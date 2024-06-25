@@ -23,6 +23,7 @@
   "homepage": "https://github.com/Gluonza/Gluonza#readme",
   "dependencies": {
     "@electron/asar": "^3.2.10",
+    "@types/ace": "^0.0.52",
     "@types/adm-zip": "^0.5.5",
     "@types/electron": "^1.6.10",
     "@types/node": "^20.14.7",

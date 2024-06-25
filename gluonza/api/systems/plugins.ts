@@ -1,5 +1,5 @@
 ﻿import {coreMods} from "./patches.js";
-import {coreLogger} from "common/consts.js";
+import {coreLogger} from "common/consts";
 
 let plugins: any[] = [];
 

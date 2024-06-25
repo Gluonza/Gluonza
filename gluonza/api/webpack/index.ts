@@ -1,6 +1,7 @@
 import { FluxDispatcher } from "discord-types/other";
 import { getLazyByKeys } from "./filters";
 import { destructuredPromise } from "../../util";
+import { startMainPatches } from "../systems/patches";
 
 export * from "./filters";
 export * from "./webpack";
@@ -26,3 +27,5 @@ getLazyByKeys<FluxDispatcher>([ "subscribe", "dispatch" ]).then((FluxDispatcher)
 
   FluxDispatcher.subscribe("CONNECTION_OPEN", listener);
 });
+
+startMainPatches();
