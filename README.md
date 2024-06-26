@@ -1,3 +1,11 @@
-# Gluonza
+<p align="center">
+  <img src="assets/Gluonza.png" alt="">
+</p>
+<p align="center">
+  <span>The ADHD client.</span>
+</p>
 
-Gluonza. The ADHD client.
+# Installation
+ - not yet. :>
+
+#### more later :>
