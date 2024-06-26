@@ -36,41 +36,31 @@ export function startThemes() {
 }
 
 export function startTheme(themeId: string) {
-    const disabledArray = getDisabledThemes();
+    const theme = findThemeById(themeId);
 
-    if (!disabledArray.includes(themeId)) {
-        const theme = findThemeById(themeId);
-
-        if (theme) {
-            theme.started = true;
-            injectCSS(theme.manifest.id, theme.source);
-            coreLogger.info(`Starting theme: ${theme.manifest.id}`);
-        } else {
-            coreLogger.error(`Theme with ID ${themeId} not found`);
-        }
+    if (theme) {
+        theme.started = true;
+        injectCSS(theme.manifest.id, theme.source);
+        coreLogger.info(`Starting theme: ${theme.manifest.id}`);
     } else {
-        coreLogger.info(`Theme with ID ${themeId} is already disabled`);
+        coreLogger.error(`Theme with ID ${themeId} not found`);
     }
 }
 
-export function disableTheme(themeId: string) {
+export function stopTheme(themeId: string) {
     const disabledArray = getDisabledThemes();
 
-    if (!disabledArray.includes(themeId)) {
-        const theme = findThemeById(themeId);
+    const theme = findThemeById(themeId);
 
-        if (theme) {
-            theme.started = false;
-            uninjectCSS(theme.manifest.id);
-            coreLogger.info(`Stopped theme: ${theme.manifest.id}`);
+    if (theme) {
+        theme.started = false;
+        uninjectCSS(theme.manifest.id);
+        coreLogger.info(`Stopped theme: ${theme.manifest.id}`);
 
-            const updatedDisabled = [...disabledArray, themeId];
-            window.gluonzaNative.storage.write('dev.glounza', { disabled: updatedDisabled });
-            coreLogger.info(`Disabled theme: ${theme.manifest.id}`);
-        } else {
-            coreLogger.error(`Theme with ID ${themeId} not found`);
-        }
+        const updatedDisabled = [...disabledArray, themeId];
+        window.gluonzaNative.storage.write('dev.glounza', { disabled: updatedDisabled });
+        coreLogger.info(`Disabled theme: ${theme.manifest.id}`);
     } else {
-        coreLogger.info(`Theme with ID ${themeId} is already disabled`);
+        coreLogger.error(`Theme with ID ${themeId} not found`);
     }
 }

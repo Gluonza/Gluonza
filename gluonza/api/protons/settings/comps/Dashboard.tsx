@@ -11,7 +11,7 @@ import { gluonza } from "../../../../window.js";
 import { getPlugins, startPlugin, stopPlugin } from "../../../systems/plugins.js";
 import { openWindow } from "../../../window/index.js";
 import { FloatingWindow } from "../../custom-css/editor.js";
-import {getThemes, startThemes, disableTheme, startTheme} from "../../../systems/themes.js";
+import {getThemes, startThemes, disableTheme, startTheme, stopTheme} from "../../../systems/themes.js";
 
 const React = proxyCache(() => {
     return window.gluonza.React;
@@ -379,9 +379,9 @@ const Card = ({ icon, name, description, version, authors, onEdit, onSettings, o
     const handleSwitchChange = () => {
         setSwitchChecked(!isSwitchChecked);
         if (isSwitchChecked) {
-            addon.manifest.id ? stopPlugin(addon.manifest.id) : disableTheme(addon.manifest.id);
+            addon.type === "theme" ? stopTheme(addon.manifest.id) : stopPlugin(addon.manifest.id);
         } else {
-            addon.manifest.id ? startPlugin(addon.manifest.id) : startTheme(addon.manifest.id);
+            addon.type === "theme" ? startTheme(addon.manifest.id) : startPlugin(addon.manifest.id);
         }
     };
 

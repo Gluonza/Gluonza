@@ -49,6 +49,25 @@ function logWarning(pluginDir: string, message: string) {
     coreLogger.warn(`${MOD_NAME} -> IPC: ${message} in ${path.join(directories.plugins, pluginDir)}`);
 }
 
+function turnCompiledCssIntoFile(compiledCss: string, manifest: {
+    name: string;
+    description: string;
+    id: string;
+    authors: string
+}) {
+    const dir = `${directories.themes}/${manifest.id}`;
+
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir, { recursive: true });
+    }
+
+    fs.writeFileSync(path.join(dir, "theme.css"), compiledCss);
+
+    fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(manifest));
+
+    return "Files successfully created.";
+}
+
 function getNativeThemes()
 {
     try {
@@ -196,6 +215,7 @@ export const gluonzaNative = {
             ipcRenderer.invoke('@gluonza/open-path', {p: path});
         }
     },
+    themes: { turnCompiledCssIntoFile },
     plugins: {
         getNativePlugins, getNativeThemes, read: (filepath: any) => {
             return ipcRenderer.invoke('read-file', {filepath: filepath})
