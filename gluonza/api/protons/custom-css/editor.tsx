@@ -1,42 +1,37 @@
-import {React, TextAreaInput} from "../../webpack/common";
+import { React } from "../../webpack/common";
 import { loadAce } from "./ace";
 import { className, createAbort } from "../../../util";
-import { Snippet, SnippetType, createNewSnippet, updateSnippets, useSnippets } from "./store";
+import { Snippet, SnippetType, createNewSnippet, deleteSnippet, updateSnippets, useSnippets } from "./store";
 import { MenuComponents, MenuRenderProps, closeMenu, openMenu } from "../../context-menu";
 import { openConfirmModal } from "../../modals";
 import { compile, initSnippet } from "./dom";
 import { Markdown } from "../../../markdown";
 import { getProxyByKeys } from "../../webpack";
-import { SetStateAction } from "react";
 
 function CSSLogo({className}: { className?: string }) {
-    const props = className ? {className} : {className: "tabbar-icon", width: 30, height: 30};
+  const props = className ? {className} : {className: "tabbar-icon", width: 30, height: 30};
 
-    return (
-        <svg {...props} viewBox="0 0 387 387" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <mask id="mask0_2_14" style={{maskType: "alpha"}} maskUnits="userSpaceOnUse" x="71" y="55" width="244"
-                  height="276">
-                <path
-                    d="M71.9989 55.7307H314.628L305.884 153.77L304.702 166.777L292.591 302.482L193.458 329.956V329.964L193.235 330.026L94.0139 302.482L87.2277 226.427H135.852L139.3 265.059L193.246 279.625L193.291 279.613V279.609L247.314 265.028L252.937 202.207L85.0635 202.207L80.7221 153.77L257.137 153.77L261.545 104.169H76.4021L71.9989 55.7307Z"
-                    fill="white"/>
-            </mask>
-            <g mask="url(#mask0_2_14)">
-                <path d="M386.916 -25L351.667 369.879L193.221 413.805L35.2117 369.941L0 -25H386.916Z" fill="#264DE4"/>
-                <path d="M321.49 344.734L351.613 7.29227H193.458V380.23L321.49 344.734Z" fill="#2965F1"/>
-            </g>
-        </svg>
-    )
+  return (
+      <svg {...props} viewBox="0 0 387 387" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <mask id="mask0_2_14" style={{maskType: "alpha"}} maskUnits="userSpaceOnUse" x="71" y="55" width="244" height="276">
+          <path d="M71.9989 55.7307H314.628L305.884 153.77L304.702 166.777L292.591 302.482L193.458 329.956V329.964L193.235 330.026L94.0139 302.482L87.2277 226.427H135.852L139.3 265.059L193.246 279.625L193.291 279.613V279.609L247.314 265.028L252.937 202.207L85.0635 202.207L80.7221 153.77L257.137 153.77L261.545 104.169H76.4021L71.9989 55.7307Z" fill="white" />
+        </mask>
+        <g mask="url(#mask0_2_14)">
+          <path d="M386.916 -25L351.667 369.879L193.221 413.805L35.2117 369.941L0 -25H386.916Z" fill="#264DE4"/>
+          <path d="M321.49 344.734L351.613 7.29227H193.458V380.23L321.49 344.734Z" fill="#2965F1"/>
+        </g>
+      </svg>
+  )
 }
 
 function SassLogo({className}: { className?: string }) {
-    const props = className ? {className} : {className: "tabbar-icon", width: 30, height: 30};
+  const props = className ? {className} : {className: "tabbar-icon", width: 30, height: 30};
 
-    return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-            <path fill="#f06292"
-                  d="M36.561,12.574c-0.904-3.545-6.781-4.71-12.343-2.734c-3.31,1.176-6.894,3.022-9.471,5.432 c-3.064,2.866-3.552,5.36-3.351,6.402c0.71,3.677,5.749,6.081,7.82,7.865v0.011c-0.611,0.301-5.081,2.563-6.127,4.876 c-1.104,2.44,0.176,4.191,1.023,4.427c2.625,0.73,5.318-0.583,6.766-2.742c1.397-2.084,1.281-4.774,0.674-6.113 c0.837-0.221,1.814-0.32,3.054-0.175c3.501,0.409,4.188,2.595,4.056,3.51c-0.131,0.915-0.866,1.418-1.111,1.57 c-0.246,0.152-0.32,0.205-0.3,0.317c0.03,0.164,0.143,0.158,0.353,0.123c0.288-0.049,1.838-0.744,1.905-2.433 c0.084-2.144-1.97-4.542-5.608-4.48c-1.498,0.026-2.44,0.168-3.121,0.422c-0.05-0.057-0.102-0.114-0.154-0.171 c-2.249-2.4-6.407-4.097-6.231-7.323c0.064-1.173,0.472-4.261,7.989-8.007c6.158-3.069,11.088-2.224,11.94-0.353 c1.217,2.674-2.635,7.643-9.03,8.36c-2.437,0.273-3.72-0.671-4.039-1.023c-0.336-0.37-0.386-0.387-0.511-0.317 c-0.204,0.113-0.075,0.44,0,0.635c0.191,0.497,0.975,1.378,2.31,1.817c1.175,0.386,4.036,0.597,7.496-0.741 C34.424,20.229,37.45,16.059,36.561,12.574z M20.076,30.638c0.29,1.074,0.258,2.076-0.041,2.983c-0.033,0.101-0.07,0.2-0.11,0.299 c-0.04,0.098-0.083,0.196-0.129,0.292c-0.231,0.48-0.542,0.929-0.922,1.344c-1.16,1.265-2.78,1.743-3.474,1.34 c-0.75-0.435-0.374-2.218,0.97-3.64c1.446-1.529,3.527-2.512,3.527-2.512l-0.003-0.006C19.954,30.705,20.015,30.672,20.076,30.638z"/>
-        </svg>
-    )
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+      <path fill="#f06292" d="M36.561,12.574c-0.904-3.545-6.781-4.71-12.343-2.734c-3.31,1.176-6.894,3.022-9.471,5.432 c-3.064,2.866-3.552,5.36-3.351,6.402c0.71,3.677,5.749,6.081,7.82,7.865v0.011c-0.611,0.301-5.081,2.563-6.127,4.876 c-1.104,2.44,0.176,4.191,1.023,4.427c2.625,0.73,5.318-0.583,6.766-2.742c1.397-2.084,1.281-4.774,0.674-6.113 c0.837-0.221,1.814-0.32,3.054-0.175c3.501,0.409,4.188,2.595,4.056,3.51c-0.131,0.915-0.866,1.418-1.111,1.57 c-0.246,0.152-0.32,0.205-0.3,0.317c0.03,0.164,0.143,0.158,0.353,0.123c0.288-0.049,1.838-0.744,1.905-2.433 c0.084-2.144-1.97-4.542-5.608-4.48c-1.498,0.026-2.44,0.168-3.121,0.422c-0.05-0.057-0.102-0.114-0.154-0.171 c-2.249-2.4-6.407-4.097-6.231-7.323c0.064-1.173,0.472-4.261,7.989-8.007c6.158-3.069,11.088-2.224,11.94-0.353 c1.217,2.674-2.635,7.643-9.03,8.36c-2.437,0.273-3.72-0.671-4.039-1.023c-0.336-0.37-0.386-0.387-0.511-0.317 c-0.204,0.113-0.075,0.44,0,0.635c0.191,0.497,0.975,1.378,2.31,1.817c1.175,0.386,4.036,0.597,7.496-0.741 C34.424,20.229,37.45,16.059,36.561,12.574z M20.076,30.638c0.29,1.074,0.258,2.076-0.041,2.983c-0.033,0.101-0.07,0.2-0.11,0.299 c-0.04,0.098-0.083,0.196-0.129,0.292c-0.231,0.48-0.542,0.929-0.922,1.344c-1.16,1.265-2.78,1.743-3.474,1.34 c-0.75-0.435-0.374-2.218,0.97-3.64c1.446-1.529,3.527-2.512,3.527-2.512l-0.003-0.006C19.954,30.705,20.015,30.672,20.076,30.638z"/>
+    </svg>
+  )
 }
 
 function LessLogo({className}: { className?: string }) {
@@ -94,7 +89,7 @@ const MegaModule = getProxyByKeys(["Anchor"]);
 const types: SnippetType[] = ["css", "scss", "sass", "less"];
 let handleAction: () => void;
 
-const TurnIntoTheme = ({snippet}) => {
+const TurnIntoTheme: React.FC<{ snippet: Snippet }> = ({snippet}) => {
     const [themeData, setThemeData] = React.useState({
         id: '',
         name: '',
@@ -156,7 +151,7 @@ const TurnIntoTheme = ({snippet}) => {
 };
 
 
-function createSnippetSubMenu(snippet: Snippet, toggle: () => void, updateLangage: (type: SnippetType) => void) {
+function createSnippetSubMenu(snippet: Snippet, toggle: () => void, updateLanguage: (type: SnippetType) => void, stopViewing: () => void) {
   const [ name, setName ] = React.useState(snippet.name);
   const isDefault = snippet.id === "css" || snippet.id === "less" || snippet.id === "scss" || snippet.id === "sass";
 
@@ -194,7 +189,7 @@ function createSnippetSubMenu(snippet: Snippet, toggle: () => void, updateLangag
                   action={() => {
                     snippet.type = type;
                     updateSnippets();
-                    updateLangage(type);
+                    updateLanguage(type);
                     initSnippet(snippet);
                   }}
                 />
@@ -236,20 +231,33 @@ function createSnippetSubMenu(snippet: Snippet, toggle: () => void, updateLangag
           })
         }}
       />
-        <MenuComponents.MenuItem
-            id="turn-css-into-theme"
-            label="Turn into Theme"
-            action={() => {openConfirmModal("Converting Stage",<TurnIntoTheme snippet={snippet}/>,{onConfirm() {
-                handleAction();
-            }})}}
-        />
-        {!isDefault && (
-            <>
-                <MenuComponents.MenuSeparator/>
-                <MenuComponents.MenuItem 
+			<MenuComponents.MenuItem
+					id="turn-css-into-theme"
+					label="Turn into Theme"
+					action={() => {
+						openConfirmModal("Converting Stage", <TurnIntoTheme snippet={snippet}/>,{
+							onConfirm() {
+								handleAction();
+							}
+						})
+					}}
+			/>
+			{!isDefault && (
+				<>
+          <MenuComponents.MenuSeparator/>
+					<MenuComponents.MenuItem 
             id="delete"
             label="Delete"
             color="danger"
+            action={() => {
+              openConfirmModal("Delete Snippet", [ "Confirm delete snippet" ], {
+                onConfirm() {
+                  deleteSnippet(snippet.id);
+                  stopViewing();
+                },
+                danger: true
+              })
+            }}
           />
         </>
       )}
@@ -257,8 +265,8 @@ function createSnippetSubMenu(snippet: Snippet, toggle: () => void, updateLangag
   )
 }
 
-function Tab({ snippet, selected, onSelect, onClose, updateLangage }: { snippet: Snippet, selected: boolean, onSelect: () => void, onClose: () => void, updateLangage: (type: SnippetType) => void }) {
-  if (!snippet.visible) return;
+function Tab({ snippet, selected, onSelect, onClose, updateLanguage }: { snippet: Snippet, selected: boolean, onSelect: () => void, onClose: () => void, updateLanguage: (type: SnippetType) => void }) {
+  if (snippet.deleted || !snippet.visible) return;
 
   return (
     <div 
@@ -277,7 +285,7 @@ function Tab({ snippet, selected, onSelect, onClose, updateLangage }: { snippet:
                 if (snippet.visible) return onClose();
                 snippet.visible = true;
                 updateSnippets();
-              }, updateLangage)}
+              }, updateLanguage, () => snippet.visible && onClose())}
             </MenuComponents.Menu>
           );
         })
@@ -308,12 +316,12 @@ function Tab({ snippet, selected, onSelect, onClose, updateLangage }: { snippet:
   )
 }
 
-function NewMenu(props: MenuRenderProps & { toggleSnippet(index: number): void, updateLangage: (type: SnippetType) => void }) {
+function NewMenu(props: MenuRenderProps & { toggleSnippet(index: number): void, updateLanguage: (type: SnippetType) => void }) {
   const [ query, setQuery ] = React.useState("");
   const snippets = useSnippets();
 
   const qsnippets = React.useMemo(() => (
-    snippets.filter((snippet) => snippet.name.toLowerCase().includes(query.toLowerCase()))
+    snippets.filter((snippet) => snippet.deleted ? false : snippet.name.toLowerCase().includes(query.toLowerCase()))
   ), [ query, snippets ]);
 
   return (
@@ -368,7 +376,7 @@ function NewMenu(props: MenuRenderProps & { toggleSnippet(index: number): void, 
           key={index}
           icon={snippet.type === "css" ? CSSLogo : snippet.type === "less" ? LessLogo : SassLogo}
         >
-          {createSnippetSubMenu(snippet, () => props.toggleSnippet(index), updateSnippets)}
+          {createSnippetSubMenu(snippet, () => props.toggleSnippet(index), updateSnippets, () => snippet.visible && props.toggleSnippet(index))}
         </MenuComponents.MenuItem>
       ))}
     </MenuComponents.Menu>
@@ -580,7 +588,7 @@ export function FloatingWindow({ window }: { window: Window & typeof globalThis 
             selected={index === selected}
             onSelect={() => selectTab(index)} 
             onClose={() => hideSnippet(index)}
-            updateLangage={(type) => editorRef.current?.session.setMode(`ace/mode/${type}`)}
+            updateLanguage={(type) => editorRef.current?.session.setMode(`ace/mode/${type}`)}
             key={index} 
           />
         ))}
@@ -595,7 +603,7 @@ export function FloatingWindow({ window }: { window: Window & typeof globalThis 
                   snippets[index].visible = true;
                   updateSnippets();
                 }}
-                updateLangage={(type) => editorRef.current?.session.setMode(`ace/mode/${type}`)} 
+                updateLanguage={(type) => editorRef.current?.session.setMode(`ace/mode/${type}`)} 
               />
             ))
           }}

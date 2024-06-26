@@ -11,8 +11,4 @@ export function openFloatingEditor() {
   })
 }
 
-window.openT = function() {
-  openFloatingEditor();
-}
-
 export const patches = [];

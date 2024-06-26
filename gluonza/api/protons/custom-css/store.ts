@@ -1,6 +1,4 @@
 import { React } from "../../webpack/common";
-import { compileLess } from "./less";
-import { compileSass } from "./sass";
 
 export type SnippetType = "css" | "scss" | "sass" | "less";
 
@@ -10,7 +8,8 @@ export interface Snippet {
   enabled: boolean,
   type: SnippetType,
   id: string,
-  visible: boolean
+  visible: boolean,
+  deleted?: true
 }
 
 interface StorageType {
@@ -19,6 +18,7 @@ interface StorageType {
 
 const storage = window.gluonzaNative.storage.read("glounza.custom-css") as StorageType;
 
+let first = true;
 export function getSnippets(): Snippet[] {
   storage.snippets ??= {};
 
@@ -53,6 +53,15 @@ export function getSnippets(): Snippet[] {
     id: "less",
     type: "less",
     visible: true
+  }
+
+  if (first) {
+    first = false;
+
+    for (const key in storage.snippets) {
+      if (!Object.prototype.hasOwnProperty.call(storage.snippets, key)) continue;
+      if (storage.snippets[key].deleted) delete storage.snippets[key];
+    }
   }
 
   const values = Object.values(storage.snippets);
@@ -112,7 +121,9 @@ export function createNewSnippet(type: SnippetType): Snippet {
   return snippet;
 }
 
-export function deleteSnippet(snippet: string) {
-  delete storage.snippets[snippet];
+export function deleteSnippet(id: string) {
+  // @ts-expect-error 
+  storage.snippets[id] = { deleted: true };
+
   updateSnippets();
 }
