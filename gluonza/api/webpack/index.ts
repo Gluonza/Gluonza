@@ -1,7 +1,7 @@
-import { FluxDispatcher } from "discord-types/other";
-import { getLazyByKeys } from "./filters";
-import { destructuredPromise } from "../../util";
-import { startMainPatches } from "../systems/patches";
+import {FluxDispatcher} from "discord-types/other";
+import {getLazyByKeys} from "./filters";
+import {destructuredPromise} from "../../util";
+import {startMainPatches} from "../systems/patches";
 
 export * from "./filters";
 export * from "./webpack";
@@ -12,20 +12,22 @@ export * from "./lazy";
 export * from "./patches";
 
 const webpackReadyP = destructuredPromise();
+
 export function whenWebpackReady() {
-  return webpackReadyP.promise;
+    return webpackReadyP.promise;
 }
+
 export let webpackReady = false;
 
-getLazyByKeys<FluxDispatcher>([ "subscribe", "dispatch" ]).then((FluxDispatcher) => {
-  function listener() {
-    webpackReady = true;
-    
-    webpackReadyP.resolve();
-    FluxDispatcher.unsubscribe("CONNECTION_OPEN", listener);
-  }
+getLazyByKeys<FluxDispatcher>(["subscribe", "dispatch"]).then((FluxDispatcher) => {
+    function listener() {
+        webpackReady = true;
 
-  FluxDispatcher.subscribe("CONNECTION_OPEN", listener);
+        webpackReadyP.resolve();
+        FluxDispatcher.unsubscribe("CONNECTION_OPEN", listener);
+    }
+
+    FluxDispatcher.subscribe("CONNECTION_OPEN", listener);
 });
 
 startMainPatches();

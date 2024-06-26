@@ -1,6 +1,6 @@
-﻿import { coreMods } from "./patches.js";
-import { addPlainTextPatch } from "../webpack/index.js";
-import { coreLogger } from "common/consts.js";
+﻿import {coreMods} from "./patches.js";
+import {addPlainTextPatch} from "../webpack/index.js";
+import {coreLogger} from "common/consts.js";
 
 type Plugin = {
     manifest: {
@@ -27,12 +27,15 @@ export function getPlugins(): PluginsArray {
 export function loadPlugins(pluginList: { source: string; manifest: { name: string; id?: string } }[]): PluginsArray {
     pluginList.forEach((plugin) => {
         const module = loadPluginModule(plugin.source);
-        plugins.push({ manifest: plugin.manifest, module, started: false, type: 'plugin' });
+        plugins.push({manifest: plugin.manifest, module, started: false, type: 'plugin'});
     });
     return plugins;
 }
 
-export function loadPluginPatches(pluginList: { source: string; manifest: { name: string; id?: string } }[]): PluginsArray {
+export function loadPluginPatches(pluginList: {
+    source: string;
+    manifest: { name: string; id?: string }
+}[]): PluginsArray {
     pluginList.forEach((plugin) => {
         const module = loadPluginModule(plugin.source);
         if (Array.isArray(module.patches)) {
@@ -43,10 +46,14 @@ export function loadPluginPatches(pluginList: { source: string; manifest: { name
 }
 
 function loadPluginModule(source: string) {
-    const module = { exports: {
+    const module = {
+        exports: {
             patches: {}
-        } };
-    new Function("module", "exports", "", source)(module, module.exports, () => { throw "no" });
+        }
+    };
+    new Function("module", "exports", "", source)(module, module.exports, () => {
+        throw "no"
+    });
     return module.exports;
 }
 
@@ -57,7 +64,7 @@ export function startCoreMods(): void {
 }
 
 async function getDisabledPlugins(): Promise<string[]> {
-    const { disabled } = await window.gluonzaNative.storage.read('dev.glounza');
+    const {disabled} = await window.gluonzaNative.storage.read('dev.glounza');
     return Array.isArray(disabled) ? disabled : [];
 }
 
@@ -102,7 +109,7 @@ export async function disablePlugin(pluginId: string): Promise<void> {
             stopPlugin(pluginId);
 
             const updatedDisabled = [...disabledArray, pluginId];
-            await window.gluonzaNative.storage.write('dev.glounza', { disabled: updatedDisabled });
+            await window.gluonzaNative.storage.write('dev.glounza', {disabled: updatedDisabled});
             coreLogger.info(`Disabled plugin: ${plugin.manifest.id}`);
         } else {
             coreLogger.error(`Plugin with ID ${pluginId} not found`);
@@ -112,7 +119,10 @@ export async function disablePlugin(pluginId: string): Promise<void> {
     }
 }
 
-function reloadPlugin(givenPlugin: { exports: {}; manifest: { id?: string } }, module?: { start: () => void; stop: () => void }, isManifestOnly: boolean = false): void {
+function reloadPlugin(givenPlugin: { exports: {}; manifest: { id?: string } }, module?: {
+    start: () => void;
+    stop: () => void
+}, isManifestOnly: boolean = false): void {
     const plugin = findPluginById(givenPlugin.manifest.id);
 
     if (plugin) {
@@ -132,7 +142,7 @@ function reloadPlugin(givenPlugin: { exports: {}; manifest: { id?: string } }, m
             plugin.manifest = givenPlugin.manifest;
             plugin.module.start();
         } else {
-            plugins.push({ manifest: givenPlugin.manifest, module, started: false });
+            plugins.push({manifest: givenPlugin.manifest, module, started: false});
             module.start();
         }
     }
@@ -148,7 +158,7 @@ window.gluonzaNative.listeners.addListener("pluginChange", async (pluginPath: st
 
         if (isManifestOnly) {
             const manifest = JSON.parse(plugin.manifest);
-            reloadPlugin({ exports: {}, manifest }, undefined, true);
+            reloadPlugin({exports: {}, manifest}, undefined, true);
         } else {
             const module = {
                 exports: {},
@@ -160,9 +170,9 @@ window.gluonzaNative.listeners.addListener("pluginChange", async (pluginPath: st
 
             new Function("module", "exports", wrappedSource)(module, module.exports);
 
-            const { start, stop, ...otherExports } = module.exports;
+            const {start, stop, ...otherExports} = module.exports;
             if (start && stop) {
-                reloadPlugin(module, { start, stop }, false);
+                reloadPlugin(module, {start, stop}, false);
             } else {
                 reloadPlugin(module, otherExports, false);
             }

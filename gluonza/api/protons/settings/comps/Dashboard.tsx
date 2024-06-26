@@ -1,17 +1,9 @@
-﻿import { proxyCache } from "../../../../util.js";
-import {
-    getByStrings,
-    getModule,
-    getProxy,
-    getProxyByKeys,
-    getProxyByStrings,
-    getStore
-} from "../../../webpack/index.js";
-import { gluonza } from "../../../../window.js";
-import { getPlugins, startPlugin, stopPlugin } from "../../../systems/plugins.js";
-import { openWindow } from "../../../window/index.js";
-import { FloatingWindow } from "../../custom-css/editor.js";
-import {getThemes, startThemes, disableTheme, startTheme, stopTheme} from "../../../systems/themes.js";
+﻿import {proxyCache} from "../../../../util.js";
+import {getModule, getProxyByKeys} from "../../../webpack/index.js";
+import {getPlugins, startPlugin, stopPlugin} from "../../../systems/plugins.js";
+import {openWindow} from "../../../window/index.js";
+import {FloatingWindow} from "../../custom-css/editor.js";
+import {getThemes, startTheme, stopTheme} from "../../../systems/themes.js";
 
 const React = proxyCache(() => {
     return window.gluonza.React;
@@ -327,7 +319,7 @@ const CloseButton: JSX.Element = proxyCache(() => {
 
 const Components = getProxyByKeys(["Anchor"]);
 
-const Tab = ({ labels, selectedTab, onSelectTab }) => {
+const Tab = ({labels, selectedTab, onSelectTab}) => {
     return (
         <div className="tabs">
             {labels.map((label, index) => (
@@ -350,7 +342,7 @@ interface SwitchProps {
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Switch: React.FC<SwitchProps> = ({ isChecked, onChange }) => {
+const Switch: React.FC<SwitchProps> = ({isChecked, onChange}) => {
     return (
         <Yeah.Switch
             className={'gluonza_addon_switch'}
@@ -363,16 +355,15 @@ const Switch: React.FC<SwitchProps> = ({ isChecked, onChange }) => {
 export default Switch;
 
 
-
-const Card = ({ icon, name, description, version, authors, onEdit, onSettings, onRefresh, onDelete, addon }) => {
+const Card = ({icon, name, description, version, authors, onEdit, onSettings, onRefresh, onDelete, addon}) => {
     const buttons = [
-        { label: "✏️", onClick: onEdit },
-        { label: "⚙️", onClick: onSettings },
-        { label: "↻", onClick: onRefresh },
-        { label: "🗑️", onClick: onDelete }
+        {label: "✏️", onClick: onEdit},
+        {label: "⚙️", onClick: onSettings},
+        {label: "↻", onClick: onRefresh},
+        {label: "🗑️", onClick: onDelete}
     ];
 
-    const titleStyle = icon == undefined ? { marginLeft: '0px !important' } : {};
+    const titleStyle = icon == undefined ? {marginLeft: '0px !important'} : {};
 
     const [isSwitchChecked, setSwitchChecked] = React.useState(addon.started);
 
@@ -388,9 +379,9 @@ const Card = ({ icon, name, description, version, authors, onEdit, onSettings, o
     return (
         <div className="gluonza_card">
             <div className="gluonza_addon_header">
-                {icon !== undefined && <img src={icon} width="32" alt="Icon" />}
+                {icon !== undefined && <img src={icon} width="32" alt="Icon"/>}
                 <div className="gluonza_addon_title" style={titleStyle}>{name}</div>
-                <Switch isChecked={isSwitchChecked} onChange={handleSwitchChange} />
+                <Switch isChecked={isSwitchChecked} onChange={handleSwitchChange}/>
             </div>
             <div className="gluonza_addon_description">{description}</div>
             <div className="gluonza_addon_footer">
@@ -407,7 +398,7 @@ const Card = ({ icon, name, description, version, authors, onEdit, onSettings, o
     );
 };
 
-const SettingsTab = ({ name, active, onClick }: SettingsTabProps) => {
+const SettingsTab = ({name, active, onClick}: SettingsTabProps) => {
     return (
         <div className={`settings_tab ${active ? 'active' : ''}`} onClick={onClick}>{name}</div>
     );
@@ -429,10 +420,10 @@ const CoreMenu: () => JSX.Element = () => (
     </div>
 );
 
-const CreditItem = ({ imgSrc, altText, name, position }) => {
+const CreditItem = ({imgSrc, altText, name, position}) => {
     return (
         <li>
-            <img src={imgSrc} alt={altText} />
+            <img src={imgSrc} alt={altText}/>
             <div className="info">
                 <strong>{name}</strong>
                 <span>{position}</span>
@@ -443,9 +434,24 @@ const CreditItem = ({ imgSrc, altText, name, position }) => {
 
 const CreditsScreen = () => {
     const credits = [
-        { imgSrc: "https://cdn.discordapp.com/avatars/515780151791976453/51e45b02bb0acf0449a87f3f1e079fc8.webp?size=56", altText: "doggybootsy", name: "doggybootsy", position: "Developer" },
-        { imgSrc: "https://cdn.discordapp.com/avatars/412388816863887362/b059978b8c4cdb99ea3286889b940a26.webp?size=56", altText: "pastellove", name: "Pastel Love", position: "CSS Designer" },
-        { imgSrc: "https://cdn.discordapp.com/avatars/801089753038061669/a_5ac8bad37d4cec451bb9003e89c9c51a.webp?size=56", altText: "Riddim", name: "Riddim Glitch", position: "Logo Assistance" },
+        {
+            imgSrc: "https://cdn.discordapp.com/avatars/515780151791976453/51e45b02bb0acf0449a87f3f1e079fc8.webp?size=56",
+            altText: "doggybootsy",
+            name: "doggybootsy",
+            position: "Developer"
+        },
+        {
+            imgSrc: "https://cdn.discordapp.com/avatars/412388816863887362/b059978b8c4cdb99ea3286889b940a26.webp?size=56",
+            altText: "pastellove",
+            name: "Pastel Love",
+            position: "CSS Designer"
+        },
+        {
+            imgSrc: "https://cdn.discordapp.com/avatars/801089753038061669/a_5ac8bad37d4cec451bb9003e89c9c51a.webp?size=56",
+            altText: "Riddim",
+            name: "Riddim Glitch",
+            position: "Logo Assistance"
+        },
     ];
 
     return (
@@ -514,8 +520,8 @@ const PluginsMenu = () => {
             <h5 className="header accent">Plugin Settings</h5>
             <Components.Clickable onClick={() => {
                 window.gluonzaNative.app.openPath('plugins');
-            }} style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
-                <FolderSVG />
+            }} style={{justifyContent: 'center', alignItems: 'center', alignSelf: 'center'}}>
+                <FolderSVG/>
             </Components.Clickable>
             <div className="cards-container">
                 {plugins.map((plugin, index) => (
@@ -538,8 +544,8 @@ const PluginsMenu = () => {
 
 const FolderSVG: () => JSX.Element = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-        <rect x="3" y="8" width="14" height="4" rx="2" ry="1" fill="#ebc262" />
-        <rect x="3" y="10" width="18" height="11" rx="2" ry="2" fill="#F1D592" />
+        <rect x="3" y="8" width="14" height="4" rx="2" ry="1" fill="#ebc262"/>
+        <rect x="3" y="10" width="18" height="11" rx="2" ry="2" fill="#F1D592"/>
     </svg>
 );
 
@@ -568,8 +574,8 @@ const ThemesMenu: () => JSX.Element = () => {
             <h5 className="header accent">Theme Settings</h5>
             <Components.Clickable onClick={() => {
                 window.gluonzaNative.app.openPath('themes');
-            }} style={{ justifyContent: 'center', alignItems: 'center', alignSelf: 'center' }}>
-                <FolderSVG />
+            }} style={{justifyContent: 'center', alignItems: 'center', alignSelf: 'center'}}>
+                <FolderSVG/>
             </Components.Clickable>
             <div className="cards-container">
                 {themes.map((theme, index) => (
@@ -596,15 +602,28 @@ interface SidebarProps {
     setActiveTab: (tab: string) => void;
 }
 
-const Sidebar: ({ onClose, activeTab, setActiveTab }: SidebarProps) => JSX.Element = ({ onClose, activeTab, setActiveTab }) => {
+const Sidebar: ({onClose, activeTab, setActiveTab}: SidebarProps) => JSX.Element = ({
+                                                                                        onClose,
+                                                                                        activeTab,
+                                                                                        setActiveTab
+                                                                                    }) => {
     const internalTabs: string[] = ["Connectivity", "Core", "UI", "Security and Privacy", "CSS Editor", "Credits"];
     const externalTabs: string[] = ["Plugins", "Themes"];
 
     return (
         <div className="sidebar">
-            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <div className="logo" style={{ height: '50px', width: '230px' }}></div>
-                <CloseButton.Z className="placeholder" keybind={"ESC"} closeAction={() => { onClose() }} style={{ background: 'red', position: 'absolute', top: '0px', right: '0', padding: '0px', margin: '20px' }}></CloseButton.Z>
+            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                <div className="logo" style={{height: '50px', width: '230px'}}></div>
+                <CloseButton.Z className="placeholder" keybind={"ESC"} closeAction={() => {
+                    onClose()
+                }} style={{
+                    background: 'red',
+                    position: 'absolute',
+                    top: '0px',
+                    right: '0',
+                    padding: '0px',
+                    margin: '20px'
+                }}></CloseButton.Z>
             </div>
             <div className="header">Internal</div>
             {internalTabs.map(tab => (
@@ -632,25 +651,25 @@ interface MainProps {
     activeTab: string;
 }
 
-const Main: ({ activeTab }: MainProps) => JSX.Element = ({ activeTab }) => {
+const Main: ({activeTab}: MainProps) => JSX.Element = ({activeTab}) => {
     const renderMenu = () => {
         switch (activeTab) {
             case "Connectivity":
-                return <ConnectivityMenu />;
+                return <ConnectivityMenu/>;
             case "Core":
-                return <CoreMenu />;
+                return <CoreMenu/>;
             case "UI":
-                return <UIMenu />;
+                return <UIMenu/>;
             case "Security and Privacy":
-                return <SecurityPrivacyMenu />;
+                return <SecurityPrivacyMenu/>;
             case "CSS Editor":
-                return <CSSEditorMenu />;
+                return <CSSEditorMenu/>;
             case "Plugins":
-                return <PluginsMenu />;
+                return <PluginsMenu/>;
             case "Themes":
-                return <ThemesMenu />;
+                return <ThemesMenu/>;
             case "Credits":
-                return <CreditsScreen />;
+                return <CreditsScreen/>;
             default:
                 return <div>Select a tab</div>;
         }
@@ -677,7 +696,7 @@ function useForceUpdate() {
     return () => setState(s => s + 1);
 }
 
-export const MainDashboard: ({ onClose }: MainDashboardProps) => JSX.Element = ({ onClose }) => {
+export const MainDashboard: ({onClose}: MainDashboardProps) => JSX.Element = ({onClose}) => {
     const [activeTab, setActiveTab] = React.useState("Connectivity");
     const [closing, setClosing] = React.useState(false);
     const forceUpdate = useForceUpdate();
@@ -704,9 +723,9 @@ export const MainDashboard: ({ onClose }: MainDashboardProps) => JSX.Element = (
 
     return (
         <div className={`app ${closing ? 'closing' : ''}`}>
-            <Sidebar onClose={handleClose} activeTab={activeTab} setActiveTab={setActiveTab} />
-            <Main activeTab={activeTab} />
-            <div className="backdrop" onClick={handleClose} />
+            <Sidebar onClose={handleClose} activeTab={activeTab} setActiveTab={setActiveTab}/>
+            <Main activeTab={activeTab}/>
+            <div className="backdrop" onClick={handleClose}/>
         </div>
     );
 };

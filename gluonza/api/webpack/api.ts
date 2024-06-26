@@ -1,61 +1,97 @@
-import { getProxyStore, getStore, getLazyStore, webpackReady, whenWebpackInit, getModuleIdBySource, getMangled, getMangledProxy } from ".";
-import { byKeys, byProtoKeys, byRegex, bySource, byStrings, combine, getByKeys, getByProtoKeys, getByRegex, getByStrings, getLazyByKeys, getLazyByProtoKeys, getLazyByRegex, getLazyByStrings, getProxyByKeys, getProxyByProtoKeys, getProxyByRegex, getProxyByStrings, not } from "./filters";
-import { getLazy } from "./lazy";
-import { getBulk, getModule, getAllModules } from "./searching";
-import { getProxy } from "./util";
-import { webpackAppChunk, webpackRequire } from ".";
+import {
+  getLazyStore,
+  getMangled,
+  getMangledProxy,
+  getModuleIdBySource,
+  getProxyStore,
+  getStore,
+  webpackAppChunk,
+  webpackReady,
+  webpackRequire,
+  whenWebpackInit
+} from ".";
+import {
+  byKeys,
+  byProtoKeys,
+  byRegex,
+  bySource,
+  byStrings,
+  combine,
+  getByKeys,
+  getByProtoKeys,
+  getByRegex,
+  getByStrings,
+  getLazyByKeys,
+  getLazyByProtoKeys,
+  getLazyByRegex,
+  getLazyByStrings,
+  getProxyByKeys,
+  getProxyByProtoKeys,
+  getProxyByRegex,
+  getProxyByStrings,
+  not
+} from "./filters";
+import {getLazy} from "./lazy";
+import {getAllModules, getBulk, getModule} from "./searching";
+import {getProxy} from "./util";
 
 import * as webpack from "./";
 import * as common from "./common";
 
 export const api = {
-  getModule,
-  getByStrings,
-  getByRegex,
-  getByKeys,
-  getByProtoKeys,
-  
-  getProxy,
-  getProxyByStrings,
-  getProxyByRegex,
-  getProxyByKeys,
-  getProxyByProtoKeys,
+    getModule,
+    getByStrings,
+    getByRegex,
+    getByKeys,
+    getByProtoKeys,
 
-  getLazy,
-  getLazyByStrings,
-  getLazyByRegex,
-  getLazyByKeys,
-  getLazyByProtoKeys,
+    getProxy,
+    getProxyByStrings,
+    getProxyByRegex,
+    getProxyByKeys,
+    getProxyByProtoKeys,
 
-  getStore,
-  getProxyStore,
-  getLazyStore,
+    getLazy,
+    getLazyByStrings,
+    getLazyByRegex,
+    getLazyByKeys,
+    getLazyByProtoKeys,
 
-  getBulk,
-  getAllModules,
+    getStore,
+    getProxyStore,
+    getLazyStore,
 
-  getMangled,
-  getMangledProxy,
+    getBulk,
+    getAllModules,
 
-  whenReady: whenWebpackInit,
-  whenInit: whenWebpackInit,
-  get require() { return webpackRequire },
-  get ready() { return webpackReady },
-  get appChunk() { return webpackAppChunk },
+    getMangled,
+    getMangledProxy,
 
-  filters: {
-    bySource,
-    byStrings,
-    byRegex,
-    byKeys,
-    byProtoKeys,
-    combine,
-    not
-  },
+    whenReady: whenWebpackInit,
+    whenInit: whenWebpackInit,
+    get require() {
+        return webpackRequire
+    },
+    get ready() {
+        return webpackReady
+    },
+    get appChunk() {
+        return webpackAppChunk
+    },
 
-  common,
+    filters: {
+        bySource,
+        byStrings,
+        byRegex,
+        byKeys,
+        byProtoKeys,
+        combine,
+        not
+    },
 
-  getModuleIdBySource,
+    common,
 
-  __raw: webpack
+    getModuleIdBySource,
+
+    __raw: webpack
 };

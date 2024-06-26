@@ -1,68 +1,75 @@
-import { getProxyByKeys } from "../webpack";
+import {getProxyByKeys} from "../webpack";
 
-const MegaModule = getProxyByKeys([ "Anchor" ]);
+const MegaModule = getProxyByKeys(["Anchor"]);
 
 interface ModalCloseButtonProps {
-  className?: string,
-  withCircleBackground?: boolean,
-  onClick?(event: React.MouseEvent<HTMLButtonElement>): void
+    className?: string,
+    withCircleBackground?: boolean,
+
+    onClick?(event: React.MouseEvent<HTMLButtonElement>): void
 };
+
 interface ModalContentProps {
-  className?: string,
-  children?: React.ReactNode,
-  scrollerRef?(): unknown
+    className?: string,
+    children?: React.ReactNode,
+
+    scrollerRef?(): unknown
 };
+
 interface ModalFooterProps {
-  className?: string,
-  children?: React.ReactNode,
-  direction?: string,
-  justify?: string,
-  align?: string,
-  wrap?: string
+    className?: string,
+    children?: React.ReactNode,
+    direction?: string,
+    justify?: string,
+    align?: string,
+    wrap?: string
 };
+
 interface ModalHeaderProps {
-  separator?: boolean,
-  className?: string,
-  children?: React.ReactNode,
-  direction?: string,
-  justify?: string,
-  align?: string,
-  wrap?: string
+    separator?: boolean,
+    className?: string,
+    children?: React.ReactNode,
+    direction?: string,
+    justify?: string,
+    align?: string,
+    wrap?: string
 };
+
 interface ModalRootProps {
-  className?: string,
-  children?: React.ReactNode,
-  onAnimationEnd?(): void,
-  hideShadow?: boolean,
-  fullscreenOnMobile?: boolean,
-  role?: string,
-  size?: string,
-  transitionState?: 0 | 1 | 2 | 3 | 4 | null
+    className?: string,
+    children?: React.ReactNode,
+    hideShadow?: boolean,
+    fullscreenOnMobile?: boolean,
+    role?: string,
+    size?: string,
+    transitionState?: 0 | 1 | 2 | 3 | 4 | null
+
+    onAnimationEnd?(): void,
 };
 
 export default {
-  get ModalCloseButton(): React.FunctionComponent<ModalCloseButtonProps> { 
-    return MegaModule.ModalCloseButton;
-  },
-  get ModalContent(): React.FunctionComponent<ModalContentProps> { 
-    return MegaModule.ModalContent;
-  },
-  get ModalFooter(): React.FunctionComponent<ModalFooterProps> { 
-    return MegaModule.ModalFooter;
-  },
-  get ModalHeader(): React.FunctionComponent<ModalHeaderProps> { 
-    return MegaModule.ModalHeader;
-  },
-  get ModalListContent(): React.FunctionComponent<any> { 
-    return MegaModule.ModalListContent;
-  },
-  get ModalRoot(): React.FunctionComponent<ModalRootProps> { 
-    return MegaModule.ModalRoot;
-  },
-  get ModalSize(): Record<"SMALL" | "MEDIUM" | "LARGE" | "DYNAMIC", string> { 
-    return MegaModule.ModalSize;
-  },
-  get ModalTransitionState(): Record<"ENTERING" | "ENTERED" | "EXITING" | "EXITED" | "HIDDEN", 0 | 1 | 2 | 3 | 4> { 
-    return MegaModule.ModalTransitionState;
-  }
+    get ModalCloseButton(): React.FunctionComponent<ModalCloseButtonProps> {
+        return MegaModule.ModalCloseButton;
+    },
+    get ModalContent(): React.FunctionComponent<ModalContentProps> {
+        return MegaModule.ModalContent;
+    },
+    get ModalFooter(): React.FunctionComponent<ModalFooterProps> {
+        return MegaModule.ModalFooter;
+    },
+    get ModalHeader(): React.FunctionComponent<ModalHeaderProps> {
+        return MegaModule.ModalHeader;
+    },
+    get ModalListContent(): React.FunctionComponent<any> {
+        return MegaModule.ModalListContent;
+    },
+    get ModalRoot(): React.FunctionComponent<ModalRootProps> {
+        return MegaModule.ModalRoot;
+    },
+    get ModalSize(): Record<"SMALL" | "MEDIUM" | "LARGE" | "DYNAMIC", string> {
+        return MegaModule.ModalSize;
+    },
+    get ModalTransitionState(): Record<"ENTERING" | "ENTERED" | "EXITING" | "EXITED" | "HIDDEN", 0 | 1 | 2 | 3 | 4> {
+        return MegaModule.ModalTransitionState;
+    }
 };

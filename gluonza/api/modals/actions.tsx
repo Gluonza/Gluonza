@@ -1,43 +1,47 @@
-import { getProxyByKeys } from "../webpack";
+import {getProxyByKeys} from "../webpack";
 
-const MegaModule = getProxyByKeys([ "Anchor" ]);
+const MegaModule = getProxyByKeys(["Anchor"]);
 
 export interface ModalProps {
-  transitionState: 0 | 1 | 2 | 3 | 4 | null,
-  onClose: () => void
+    transitionState: 0 | 1 | 2 | 3 | 4 | null,
+    onClose: () => void
 };
 
 export type ModalComponent = (props: ModalProps) => React.ReactNode;
 
 export type ModalOptions = {
-  modalKey?: string,
-  instant?: boolean,
-  onCloseRequest?: Function,
-  onCloseCallback?: Function,
-  contextKey?: "default" | "popout"
+    modalKey?: string,
+    instant?: boolean,
+    onCloseRequest?: Function,
+    onCloseCallback?: Function,
+    contextKey?: "default" | "popout"
 };
 
 let counter = 0;
+
 export function openModal(Component: ModalComponent, options: ModalOptions = {}) {
-  options.modalKey ??= `glounza-${counter++}`;
+    options.modalKey ??= `glounza-${counter++}`;
 
-  if (typeof Component !== "function") () => Component;
+    if (typeof Component !== "function") () => Component;
 
-  MegaModule.openModal((props: ModalProps) => (
-    <Component {...props} />
-  ), options);
+    MegaModule.openModal((props: ModalProps) => (
+        <Component {...props} />
+    ), options);
 
-  return {
-    close: () => closeModal(options.modalKey!),
-    id: options.modalKey
-  };
+    return {
+        close: () => closeModal(options.modalKey!),
+        id: options.modalKey
+    };
 };
-export function closeModal(id: string) {  
-  MegaModule.closeModal(id);
+
+export function closeModal(id: string) {
+    MegaModule.closeModal(id);
 };
+
 export function closeAllModals() {
-  MegaModule.closeAllModals();
+    MegaModule.closeAllModals();
 };
+
 export function hasModalOpen(id: string) {
-  return MegaModule.hasModalOpen(id);
+    return MegaModule.hasModalOpen(id);
 };

@@ -8,7 +8,7 @@ import {join} from "path";
 const {env} = process;
 
 class PatchedBrowserWindow extends BrowserWindow {
-    constructor(opts: Electron.BrowserWindowConstructorOptions) {        
+    constructor(opts: Electron.BrowserWindowConstructorOptions) {
         // Make sure to only get the main window
         if (!opts || !opts.webPreferences || !opts.webPreferences.preload) {
             super(opts);
@@ -19,13 +19,11 @@ class PatchedBrowserWindow extends BrowserWindow {
             env.DISCORD_PRELOADER = opts.webPreferences!.preload;
 
             opts.webPreferences!.preload = join(__dirname, "./preload.js");
-        }
-        else if (opts.webPreferences.preload.includes("splash")) {
+        } else if (opts.webPreferences.preload.includes("splash")) {
             env.DISCORD_PRELOADER_SPLASH = opts.webPreferences!.preload;
 
             opts.webPreferences!.preload = join(__dirname, "./splash.js");
-        }
-        else {
+        } else {
             super(opts);
             return;
         }

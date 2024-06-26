@@ -1,19 +1,19 @@
-﻿import { session, app } from "electron";
+﻿import {app, session} from "electron";
 
 app.on("ready", () => {
-    session.defaultSession.webRequest.onHeadersReceived(({ responseHeaders }, callback) => {
+    session.defaultSession.webRequest.onHeadersReceived(({responseHeaders}, callback) => {
         if (responseHeaders) {
             Object.keys(responseHeaders)
                 .filter(k => (/^content-security-policy/i).test(k))
                 .map(k => (delete responseHeaders[k]));
         }
-        callback({ responseHeaders });
+        callback({responseHeaders});
     });
 
-    session.defaultSession.webRequest.onBeforeRequest(({ url }, callback) => {
+    session.defaultSession.webRequest.onBeforeRequest(({url}, callback) => {
         const pattern = /api\/v\d\/(science|metrics)/;
         const michealDontLeaveMeHere = pattern.test(url);
 
-        callback({ cancel: michealDontLeaveMeHere });
+        callback({cancel: michealDontLeaveMeHere});
     });
 })

@@ -1,4 +1,4 @@
-import { downloadAndLoadRDT } from "./rdt";
+import {downloadAndLoadRDT} from "./rdt";
 
 import "./overrides";
 import "./ipc";

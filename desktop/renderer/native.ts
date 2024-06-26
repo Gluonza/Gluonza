@@ -57,8 +57,8 @@ function turnCompiledCssIntoFile(compiledCss: string, manifest: {
 }) {
     const dir = `${directories.themes}/${manifest.id}`;
 
-    if (!fs.existsSync(dir)){
-        fs.mkdirSync(dir, { recursive: true });
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, {recursive: true});
     }
 
     fs.writeFileSync(path.join(dir, "theme.css"), compiledCss);
@@ -68,13 +68,12 @@ function turnCompiledCssIntoFile(compiledCss: string, manifest: {
     return "Files successfully created.";
 }
 
-function getNativeThemes()
-{
+function getNativeThemes() {
     try {
         const themes = [];
 
         const themeDirectories = getPluginDirectories(directories.themes);
-        
+
         for (const dir of themeDirectories) {
             const manifestPath = path.join(directories.themes, dir, 'manifest.json');
             const stylePath = path.join(directories.themes, dir, 'theme.css');
@@ -100,17 +99,14 @@ function getNativeThemes()
                             ? 'Ignoring. '
                             : 'Loading.')
                     );
-            }
-            else
+            } else
                 logWarning(dir, 'manifest.json or theme.css missing. Theme will not load.');
         }
 
-        return { status: 'success', themes };
-    }
-    catch (error)
-    {
+        return {status: 'success', themes};
+    } catch (error) {
         console.warn(`${MOD_NAME} -> IPC: Error loading themes:`, error);
-        return { status: 'error', message: (error as Error).message };
+        return {status: 'error', message: (error as Error).message};
     }
 }
 
@@ -215,7 +211,7 @@ export const gluonzaNative = {
             ipcRenderer.invoke('@gluonza/open-path', {p: path});
         }
     },
-    themes: { turnCompiledCssIntoFile },
+    themes: {turnCompiledCssIntoFile},
     plugins: {
         getNativePlugins, getNativeThemes, read: (filepath: any) => {
             return ipcRenderer.invoke('read-file', {filepath: filepath})

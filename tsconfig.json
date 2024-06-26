@@ -14,10 +14,18 @@
     "module": "ESNext",
     "moduleResolution": "Node10",
     "paths": {
-      "common": ["./common"],
-      "common/*": ["./common/*"],
-      "typings": ["./typings"],
-      "typings/*": ["./typings/*"]
+      "common": [
+        "./common"
+      ],
+      "common/*": [
+        "./common/*"
+      ],
+      "typings": [
+        "./typings"
+      ],
+      "typings/*": [
+        "./typings/*"
+      ]
     },
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
@@ -26,7 +34,9 @@
     "strict": true,
     "noImplicitAny": true,
     "skipLibCheck": true,
-
-    "typeRoots": ["./node_modules/@types", "./typings/index.d.ts"]
+    "typeRoots": [
+      "./node_modules/@types",
+      "./typings/index.d.ts"
+    ]
   }
 }

@@ -4,7 +4,7 @@
 };
 
 export function waitForNode<T extends Element>(query: string, options: waitForNodeOptions = {}): Promise<T> {
-    const { target = document, signal } = options;
+    const {target = document, signal} = options;
 
     const exists = target.querySelector<T>(query);
     if (exists) return Promise.resolve(exists);
@@ -53,7 +53,7 @@ interface waitForElementRemovedOptions {
 };
 
 export function waitForElementRemoved(element: Node, options: waitForElementRemovedOptions = {}) {
-    const { target = element.ownerDocument ?? document, signal } = options;
+    const {target = element.ownerDocument ?? document, signal} = options;
 
     return new Promise<void>((resolve, reject) => {
         const observer = new MutationObserver((mutations) => {

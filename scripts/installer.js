@@ -1,5 +1,5 @@
 ﻿import fs from "node:fs";
-import path, { join } from "node:path";
+import path, {join} from "node:path";
 import readline from "node:readline";
 import cp from "node:child_process";
 import asar from "@electron/asar";
@@ -71,7 +71,7 @@ const getAllUserProfiles = () => {
 };
 
 const killDiscord = () => new Promise((r) => {
-    cp.exec(`Get-Process -Name ${baseFolderName} -ea SilentlyContinue | Stop-Process -Force`, { shell: "powershell" }, () => r()).on("error", () => r());
+    cp.exec(`Get-Process -Name ${baseFolderName} -ea SilentlyContinue | Stop-Process -Force`, {shell: "powershell"}, () => r()).on("error", () => r());
 });
 
 const findDiscordPaths = (profilePath) => {
@@ -112,13 +112,13 @@ const makeGlounzaAsar = async () => {
         Logger.red("You need to compile glounza first!");
         process.exit(1);
     }
-    
+
     if (fs.existsSync(join(dirname, "..", "app.asar"))) {
         fs.rmSync(join(dirname, "..", "app.asar"));
     }
 
     if (!fs.existsSync(join(dirname, "..", "app"))) fs.mkdirSync(join(dirname, "..", "app"));
- 
+
     await fs.promises.writeFile(join(dirname, "..", "app", "index.js"), `if (!process.argv.includes("--vanilla")) require(${gluonzaPath});\nrequire("../glounza.app.asar");`);
     await fs.promises.writeFile(join(dirname, "..", "app", "package.json"), JSON.stringify({
         main: "./index.js"
@@ -129,7 +129,7 @@ const makeGlounzaAsar = async () => {
 
 const selectTargetPath = (selectedPath) => {
     const asarPath = path.join(selectedPath, "app.asar");
-    const asarPathOriginal = path.join(selectedPath, "glounza.app.asar");    
+    const asarPathOriginal = path.join(selectedPath, "glounza.app.asar");
 
     rl.question(`Are you sure you want to install it to "${selectedPath}"? (yes/no): `, async (confirmation) => {
         if (confirmation.toLowerCase() === 'yes' || confirmation.toLowerCase() === 'y') {

@@ -7,4 +7,4 @@ export * from "./confirmModal";
 // export * from "./user";
 // export * from "./invite";
 // export * from "./window";
-export { default as ModalComponents } from "./components";
+export {default as ModalComponents} from "./components";

@@ -1,5 +1,5 @@
-import { coreLogger } from "common/consts.js";
-import { injectCSS, uninjectCSS } from "common/dom.js";
+import {coreLogger} from "common/consts.js";
+import {injectCSS, uninjectCSS} from "common/dom.js";
 
 let themesList: any[] = [];
 
@@ -9,13 +9,13 @@ export function getThemes() {
 
 export function loadThemes(themes: []) {
     themes.forEach((theme: { source: string; manifest: { id: string, name: string } }) => {
-        themesList.push({ manifest: theme.manifest, source: theme.source, started: false, type: 'theme' });
+        themesList.push({manifest: theme.manifest, source: theme.source, started: false, type: 'theme'});
     });
     return themesList;
 }
 
 function getDisabledThemes() {
-    const { disabled } = window.gluonzaNative.storage.read('dev.glounza');
+    const {disabled} = window.gluonzaNative.storage.read('dev.glounza');
     return Array.isArray(disabled) ? disabled : [];
 }
 
@@ -58,7 +58,7 @@ export function stopTheme(themeId: string) {
         coreLogger.info(`Stopped theme: ${theme.manifest.id}`);
 
         const updatedDisabled = [...disabledArray, themeId];
-        window.gluonzaNative.storage.write('dev.glounza', { disabled: updatedDisabled });
+        window.gluonzaNative.storage.write('dev.glounza', {disabled: updatedDisabled});
         coreLogger.info(`Disabled theme: ${theme.manifest.id}`);
     } else {
         coreLogger.error(`Theme with ID ${themeId} not found`);

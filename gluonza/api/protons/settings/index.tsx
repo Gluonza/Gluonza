@@ -1,4 +1,5 @@
-﻿﻿import {byStrings, getModule} from "../../webpack/index.js";
+﻿﻿
+import {byStrings, getModule} from "../../webpack/index.js";
 import {proxyCache} from "../../../util.js";
 import {injectCSS} from "common/dom.js";
 import {DashboardStyle, MainDashboard} from "./comps/Dashboard.js";
@@ -45,7 +46,9 @@ export function Dashboard() {
     const isOpen = useState();
     if (!isOpen) return null;
 
-    return <MainDashboard onClose={() => {setState(!getState())}}/>
+    return <MainDashboard onClose={() => {
+        setState(!getState())
+    }}/>
 }
 
 injectCSS('settings', DashboardStyle)

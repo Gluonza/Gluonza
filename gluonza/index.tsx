@@ -1,8 +1,8 @@
 // # do mod stuff idk
 
-import { gluonza } from "./window";
+import {gluonza} from "./window";
 import {whenWebpackReady} from "./api/webpack/index.js";
-import {loadPluginPatches, loadPlugins, startPlugins} from "./api/systems/plugins.js";
+import {loadPlugins, startPlugins} from "./api/systems/plugins.js";
 import {loadThemes, startThemes} from "./api/systems/themes.js";
 
 window.gluonza = gluonza;
