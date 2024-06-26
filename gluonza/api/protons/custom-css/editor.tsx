@@ -239,7 +239,7 @@ function createSnippetSubMenu(snippet: Snippet, toggle: () => void, updateLangag
         <MenuComponents.MenuItem
             id="turn-css-into-theme"
             label="Turn into Theme"
-            action={() => {openConfirmModal('stuff',<TurnIntoTheme snippet={snippet}/>,{onConfirm() {
+            action={() => {openConfirmModal("Converting Stage",<TurnIntoTheme snippet={snippet}/>,{onConfirm() {
                 handleAction();
             }})}}
         />
