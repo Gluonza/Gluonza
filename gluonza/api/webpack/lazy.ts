@@ -60,7 +60,7 @@ export function getLazy<T extends R extends true ? any : Object, R extends boole
         if (!Reflect.has(module.exports, key)) continue;
 
         if (filter.call(module, exported, module, module.id)) {
-          resolve(exported);
+          resolve(raw ? module : exported);
           return undoListener();
         }
       }

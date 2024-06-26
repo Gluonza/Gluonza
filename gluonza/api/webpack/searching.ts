@@ -11,18 +11,6 @@ T extends R extends true ? any : Object,
 
   if (!webpackRequire) return undefined;
 
-  /*if (raw) {
-    const filter = $filter as Webpack.RawFilter;
-    for (const id in webpackRequire.c) {
-      if (Object.prototype.hasOwnProperty.call(webpackRequire.c, id)) {
-        const module = webpackRequire.c[id];
-
-        if (filter.call(module, module, id)) return module as E;
-      }
-    }
-    return;
-  }*/
-  
   const filter = wrapFilter($filter as Webpack.Filter);
   for (const id in webpackRequire.c) {
     if (Object.prototype.hasOwnProperty.call(webpackRequire.c, id)) {
@@ -34,7 +22,7 @@ T extends R extends true ? any : Object,
       else if (searchDefault && shouldSearchDefault(module)) keys.push("default");
 
       if (filter.call(module, module.exports, module, module.id)) {
-        return raw ? (module as unknown as E) : (module.exports as unknown as E);
+        return raw ? (module as unknown as E) : (module.exports as E);
       }
 
       for (const key of keys) {
