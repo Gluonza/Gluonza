@@ -3,6 +3,7 @@ import {injectCSS, uninjectCSS} from "common/dom.js";
 import {Dashboard, OpenSettingsButton} from "./api/protons/settings/index.js";
 import {getPlugins, startPlugin, stopPlugin} from "./api/systems/plugins.js";
 import {getThemes, startTheme, stopTheme} from "./api/systems/themes.js";
+import { Injector } from "./api/patcher";
 
 export const gluonza = {
     webpack: api,
@@ -13,5 +14,6 @@ export const gluonza = {
     _self: {OpenSettingsButton, Dashboard},
     get React() {
         return api.common.React
-    }
+    },
+    Injector
 }
