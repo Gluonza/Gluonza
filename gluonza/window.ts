@@ -4,6 +4,7 @@ import {Dashboard, OpenSettingsButton} from "./api/protons/settings/index.js";
 import {getPlugins, startPlugin, stopPlugin} from "./api/systems/plugins.js";
 import {getThemes, startTheme, stopTheme} from "./api/systems/themes.js";
 import { Injector } from "./api/patcher";
+import * as menu from "./api/context-menu";
 
 export const gluonza = {
     webpack: api,
@@ -15,5 +16,6 @@ export const gluonza = {
     get React() {
         return api.common.React
     },
-    Injector
+    Injector,
+    menu
 }

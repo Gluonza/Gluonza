@@ -2,6 +2,7 @@ import {byStrings, getMangledProxy} from "../webpack";
 import {dirtyDispatch} from "../webpack/common";
 
 export {default as MenuComponents} from "./components";
+export * from "./patch";
 
 export interface MenuRenderProps {
     className: "context-menu",
