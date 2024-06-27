@@ -78,7 +78,7 @@ export const DashboardStyle = `
 }
 
 .sidebar .logo {
-    background: url('https://cdn.discordapp.com/attachments/1128887206476513420/1254141344964808744/Gluonza.png?ex=667869a5&is=66771825&hm=e646e5417470663f34f9c510ee2c2c0a8dff27a842cebde18901570ab5bc846e&') center/cover;
+    background: url('https://github.com/Gluonza/Gluonza/blob/main/assets/Gluonza.png?raw=true') center/cover;
 }
 
 .sidebar .header {
