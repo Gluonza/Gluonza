@@ -100,6 +100,12 @@ declare module Less {
     }
 }
 
+
+interface Node {
+    __reactFiber$?: import("react-reconciler").Fiber,
+    __reactProps$?: any
+}
+
 type gluonzaGlobal = typeof import("../gluonza/window")["gluonza"];
 
 interface DiscordWindow {

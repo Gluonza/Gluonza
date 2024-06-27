@@ -5,6 +5,7 @@ import {getPlugins, startPlugin, stopPlugin} from "./api/systems/plugins.js";
 import {getThemes, startTheme, stopTheme} from "./api/systems/themes.js";
 import { Injector } from "./api/patcher";
 import * as menu from "./api/context-menu";
+import * as util from "./util";
 
 export const gluonza = {
     webpack: api,
@@ -17,5 +18,6 @@ export const gluonza = {
         return api.common.React
     },
     Injector,
-    menu
+    menu,
+    util
 }
