@@ -20,6 +20,8 @@ type PluginsArray = Plugin[];
 let plugins: PluginsArray = [];
 declare const window: any;
 
+
+
 export function getPlugins(): PluginsArray {
     return plugins;
 }
@@ -59,7 +61,7 @@ function loadPluginModule(source: string) {
 
 export function startCoreMods(): void {
     coreMods.forEach((plugin) => {
-        plugin.start();
+        plugin?.start?.();
     });
 }
 
