@@ -59,5 +59,3 @@ export function getLazy<T extends R extends true ? any : Object, R extends boole
         }
     });
 }
-
-queueMicrotask(() => getLazy(m => m.memo && m.createElement).then(console.log))
