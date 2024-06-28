@@ -42,7 +42,9 @@ export const GuildMemberStore = getProxyStore("GuildMemberStore");
 // For now
 export let React: typeof import("react");
 
-getLazyByKeys<typeof import("react")>(["memo", "createElement"]).then(r => React = r);
+getLazyByKeys<typeof import("react")>(["memo", "createElement"]).then(r => {
+    React = r;
+});
 
 export interface Store {
     prototype: GenericStore

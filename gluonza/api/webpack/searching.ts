@@ -4,10 +4,9 @@ import {webpackRequire} from ".";
 export function getModule<
     T extends R extends true ? any : Object,
     R extends boolean = false,
-    E = R extends true ? Webpack.Module<T> : T,
-    F = R extends true ? Webpack.RawFilter : Webpack.Filter
->($filter: F, opts: Webpack.FilterOptions<R> = {}): E | undefined {
-    const {searchDefault = true, searchExports = false, raw = false} = opts;
+    E = R extends true ? Webpack.Module<T> : T
+>($filter: Webpack.Filter, opts: Webpack.FilterOptions<R> = {}): E | undefined {
+    const {searchDefault = true, searchExports = false, raw = false,defaultExport} = opts;
 
     if (!webpackRequire) return undefined;
 
@@ -17,12 +16,19 @@ export function getModule<
             const module = webpackRequire.c[id] as Webpack.Module<T>;
             if (shouldSkipModule(module)) continue;
 
+            if (defaultExport === false) {
+                if (!shouldSearchDefault(module)) continue;
+                if (!(module.exports.default instanceof Object)) continue;
+                if (filter.call(module, module.exports.default, module, id)) return module.exports;
+                continue;
+            }
+
             const keys: string[] = [];
             if (searchExports) keys.push(...Object.keys(module.exports));
             else if (searchDefault && shouldSearchDefault(module)) keys.push("default");
 
             if (filter.call(module, module.exports, module, module.id)) {
-                return raw ? (module as unknown as E) : (module.exports as E);
+                return raw ? (module as unknown as E) : (module.exports as unknown as E);
             }
 
             for (const key of keys) {

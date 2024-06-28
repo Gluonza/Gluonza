@@ -24,12 +24,12 @@ declare module Webpack {
 
     type Filter = (this: Module, exported: any, module: Module, id: PropertyKey) => any;
     type ExportedOnlyFilter = (exported: any) => any;
-    type RawFilter = (this: Module, module: Module, id: PropertyKey) => any;
 
     type FilterOptions<T extends boolean = false> = {
         searchExports?: boolean,
         searchDefault?: boolean,
-        raw?: T
+        raw?: T,
+        defaultExport?: false
     };
     type BulkFilter = {
         searchExports?: boolean,

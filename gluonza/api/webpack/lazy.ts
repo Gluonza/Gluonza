@@ -1,41 +1,12 @@
 import {getModule, listeners} from ".";
 import {shouldSearchDefault, shouldSkipModule, wrapFilter} from "./shared";
 
-export function getLazy<T extends R extends true ? any : Object, R extends boolean = false, E = R extends true ? Webpack.Module<T> : T, F = R extends true ? Webpack.RawFilter : Webpack.Filter>($filter: F, opts: Webpack.LazyFilterOptions<R> = {}): Promise<E> {
-    const cached = getModule<T, R, E, F>($filter, opts);
+export function getLazy<T extends R extends true ? any : Object, R extends boolean = false, E = R extends true ? Webpack.Module<T> : T>($filter: Webpack.Filter, opts: Webpack.LazyFilterOptions<R> = {}): Promise<E> {
+    const cached = getModule<T, R, E>($filter, opts);
     if (cached) return Promise.resolve(cached);
 
     return new Promise((resolve, reject) => {
-        const {searchDefault = true, searchExports = false, raw = false, signal} = opts;
-
-        if (raw) {
-            const filter = $filter as Webpack.RawFilter;
-
-            const undoListener = () => void listeners.delete(listener);
-
-            function listener(module: Webpack.Module) {
-                if (shouldSkipModule(module)) return;
-
-                try {
-                    if (filter.call(module, module, module.id)) {
-                        resolve(module.exports);
-                        return undoListener();
-                    }
-                } catch (error) {
-
-                }
-            }
-
-            listeners.add(listener);
-
-            if (signal) {
-                signal.addEventListener("abort", () => {
-                    reject(new Error("User aborted lazy module search"));
-                    undoListener();
-                })
-            }
-            return;
-        }
+        const {searchDefault = true, searchExports = false, raw = false, signal,defaultExport} = opts;
 
         const filter = wrapFilter($filter as Webpack.Filter);
 
@@ -44,8 +15,20 @@ export function getLazy<T extends R extends true ? any : Object, R extends boole
         function listener(module: Webpack.Module) {
             if (shouldSkipModule(module)) return;
 
+            if (defaultExport === false) {
+                if (!shouldSearchDefault(module)) return;
+                if (!(module.exports.default instanceof Object)) return;
+
+                if (filter.call(module, module.exports.default, module, module.id)) {
+                    resolve(module.exports);
+                    return undoListener();
+                }
+
+                return;
+            }
+
             if (filter.call(module, module.exports, module, module.id)) {
-                resolve(module.exports);
+                resolve(raw ? module : module.exports);
                 return undoListener();
             }
 
@@ -76,3 +59,5 @@ export function getLazy<T extends R extends true ? any : Object, R extends boole
         }
     });
 }
+
+queueMicrotask(() => getLazy(m => m.memo && m.createElement).then(console.log))
