@@ -29,7 +29,7 @@ declare module Webpack {
         searchExports?: boolean,
         searchDefault?: boolean,
         raw?: T,
-        defaultExport?: false
+        defaultExport?: boolean
     };
     type BulkFilter = {
         searchExports?: boolean,

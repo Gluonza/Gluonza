@@ -46,6 +46,51 @@ export function getModule<
     return undefined;
 }
 
+export function BDgetModule<
+    T extends R extends true ? any : Object,
+    R extends boolean = false,
+    E = R extends true ? Webpack.Module<T> : T
+>($filter: Webpack.Filter, opts: Webpack.FilterOptions<R> = {}): E | undefined {
+    const {searchDefault = true, searchExports = false, raw = false,defaultExport} = opts;
+
+    if (!webpackRequire) return undefined;
+
+    const filter = wrapFilter($filter as Webpack.Filter);
+    for (const id in webpackRequire.c) {
+        if (Object.prototype.hasOwnProperty.call(webpackRequire.c, id)) {
+            const module = webpackRequire.c[id] as Webpack.Module<T>;
+            if (shouldSkipModule(module)) continue;
+
+            if (defaultExport === false) {
+                if (!shouldSearchDefault(module)) continue;
+                if (!(module.exports.default instanceof Object)) continue;
+                if (filter.call(module, module.exports.default, module, id)) return module.exports;
+                continue;
+            }
+
+            const keys: string[] = [];
+            if (searchExports) keys.push(...Object.keys(module.exports));
+            else if (searchDefault && shouldSearchDefault(module)) keys.push("default");
+
+            if (filter.call(module, module.exports, module, module.id)) {
+                return raw ? (module as unknown as E) : (module.exports as unknown as E);
+            }
+
+            for (const key of keys) {
+                if (!Reflect.has(module.exports, key)) continue;
+                const exported = module.exports[key];
+                if (!(exported instanceof Object)) continue;
+
+                if (filter.call(module, exported, module, module.id)) {
+                    return raw ? (module as unknown as E) : (exported as E);
+                }
+            }
+        }
+    }
+
+    return undefined;
+}
+
 export function getAllModules(filter: Webpack.Filter, opts: Webpack.FilterOptions = {}) {
     const modules: any[] = [];
 

@@ -151,6 +151,47 @@ function getNativePlugins() {
     }
 }
 
+function getBetterDiscordPlugins() {
+    try {
+        const plugins = [];
+        const pluginDirectories = getPluginDirectories(directories.plugins);
+
+        for (const dir of pluginDirectories) {
+            try {
+                const manifestPath = path.join(directories.plugins, dir, 'manifest.json');
+                const indexPath = path.join(directories.plugins, dir, 'index.js');
+
+                if (fs.existsSync(manifestPath) && fs.existsSync(indexPath)) {
+                    const manifest = readManifest(manifestPath);
+                    const source = fs.readFileSync(indexPath, 'utf-8');
+                    const missingManifestFields = getMissingManifestFields(manifest);
+
+                    if (!missingManifestFields.includes('id')) plugins.push({manifest, source});
+
+                    if (missingManifestFields.length > 0) {
+                        logWarning(
+                            dir,
+                            `Manifest is missing the following properties: { ${missingManifestFields.join(', ')} }; ` +
+                            (missingManifestFields.includes('id')
+                                ? 'Ignoring. '
+                                : 'Loading.')
+                        );
+                    }
+                } else {
+                    logWarning(dir, 'manifest.json or index.js missing. Plugin will not load.');
+                }
+            } catch (error) {
+                console.warn('error:', error);
+            }
+        }
+
+        return {status: 'success', plugins};
+    } catch (error) {
+        console.warn(`${MOD_NAME} -> IPC: Error loading plugins:`, error);
+        return {status: 'error', message: error.message};
+    }
+}
+
 function startWatcher() {
     const PathPlugins = path.join(appdata, MOD_NAME, 'plugins');
     const watcherPlugins = chokidar.watch(PathPlugins, {

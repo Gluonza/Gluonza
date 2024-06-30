@@ -89,6 +89,108 @@ function hookFunction<M extends Record<PropertyKey, any>, K extends KeysMatching
 
 const patches = new WeakMap<Injector, Set<UndoFunction>>();
 
+export class Patcher {
+  static #map = {};
+  static before(id, ...args) {
+    const patcher = Patcher.#map[id] ??= new Patcher(id);
+
+    return patcher.before(...args);
+  }
+  static instead(id, ...args) {
+    const patcher = Patcher.#map[id] ??= new Patcher(id);
+
+    return patcher.instead(...args);
+  }
+  static after(id, ...args) {
+    const patcher = Patcher.#map[id] ??= new Patcher(id);
+
+    return patcher.after(...args);
+  }
+  static unpatchAll(id) {
+    const patcher = Patcher.#map[id] ??= new Patcher(id);
+
+    patcher.unpatchAll();
+  }
+  static getPatchesByCaller(id) {
+    const patcher = Patcher.#map[id] ??= new Patcher(id);
+
+    return patcher.getPatchesByCaller();
+  }
+
+  constructor(name) {
+    if (Patcher.#map[name]) return Patcher.#map[name];
+    this.#name = name;
+    Patcher.#map[name] = this;
+  }
+  #name;
+  #id = 0;
+  #injector = new window.gluonza.Injector();
+  #patches = new Set();
+
+  getPatchesByCaller() {
+    return [...this.#patches];
+  }
+
+  before(...args: any[]) {
+    const undo = this.#injector.before(...args);
+
+    const obj = {
+      callback: args[2],
+      id: this.#id++,
+      type: "before",
+      caller: this.#name,
+      unpatch: () => {
+        this.#patches.delete(obj);
+        undo();
+      }
+    }
+
+    this.#patches.add(obj);
+
+    return obj.unpatch;
+  }
+  instead(...args: any[]) {
+    const undo = this.#injector.instead(...args);
+
+    const obj = {
+      callback: args[2],
+      id: this.#id++,
+      type: "instead",
+      caller: this.#name,
+      unpatch: () => {
+        this.#patches.delete(obj);
+        undo();
+      }
+    }
+
+    this.#patches.add(obj);
+
+    return obj.unpatch;
+  }
+  after(...args) {
+    const undo = this.#injector.after(...args);
+
+    const obj = {
+      callback: args[2],
+      id: this.#id++,
+      type: "after",
+      caller: this.#name,
+      unpatch: () => {
+        this.#patches.delete(obj);
+        undo();
+      }
+    }
+
+    this.#patches.add(obj);
+
+    return obj.unpatch;
+  }
+  unpatchAll(...args) {
+    for (const iterator of this.#patches) {
+      iterator.unpatch();
+    }
+  }
+}
 export class Injector {
   public static return<T extends any>(value: T) {
     return new InjectorReturn(value);

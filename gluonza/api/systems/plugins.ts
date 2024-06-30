@@ -1,6 +1,7 @@
 ﻿import {coreMods} from "./patches.js";
 import {addPlainTextPatch} from "../webpack/index.js";
 import {coreLogger} from "common/consts.js";
+import {startBD} from "../protons/BdApi/index.js";
 
 type Plugin = {
     manifest: {
@@ -27,6 +28,7 @@ export function getPlugins(): PluginsArray {
 }
 
 export function loadPlugins(pluginList: { source: string; manifest: { name: string; id?: string } }[]): PluginsArray {
+    window.BdApi = startBD();
     pluginList.forEach((plugin) => {
         const module = loadPluginModule(plugin.source);
         plugins.push({manifest: plugin.manifest, module, started: false, type: 'plugin'});
@@ -53,9 +55,12 @@ function loadPluginModule(source: string) {
             patches: {}
         }
     };
-    new Function("module", "exports", "", source)(module, module.exports, () => {
-        throw "no"
-    });
+    try
+    {
+        new Function("module", "exports", "", source)(module, module.exports, () => {
+            throw "no"
+        });
+    } catch (e) {}
     return module.exports;
 }
 
@@ -77,7 +82,7 @@ function findPluginById(id: string | undefined) {
 export function startPlugin(id: string | undefined): void {
     const plugin = findPluginById(id);
     if (plugin) {
-        plugin.module?.start();
+        plugin.module?.start?.() ?? plugin.module?.prototype?.start?.();
         plugin.started = true;
     }
 }
@@ -85,7 +90,7 @@ export function startPlugin(id: string | undefined): void {
 export function stopPlugin(id: string | undefined): void {
     const plugin = findPluginById(id);
     if (plugin) {
-        plugin.module?.stop();
+        plugin.module?.stop?.() ?? plugin.module?.prototype?.stop?.();
         plugin.started = false;
     }
 }
@@ -96,7 +101,9 @@ export async function startPlugins(): Promise<void> {
     plugins.forEach((plugin) => {
         if (disabledArray.includes(<string>plugin.manifest.id)) return;
 
-        startPlugin(plugin.manifest.id);
+        try {
+            startPlugin(plugin.manifest.id);
+        } catch (err) {}
         coreLogger.info(`Started plugin: ${plugin.manifest.id}`);
     });
 }
@@ -152,6 +159,40 @@ function reloadPlugin(givenPlugin: { exports: {}; manifest: { id?: string } }, m
 
 window.gluonzaNative.listeners.addListener("pluginChange", async (pluginPath: string) => {
     coreLogger.info(`Plugin ${pluginPath} has changed`);
+
+    try {
+        const pluginName = pluginPath.split('/').pop();
+        const isManifestOnly = pluginPath.endsWith('manifest.json');
+        const plugin = await window.gluonzaNative.plugins.read(pluginName);
+
+        if (isManifestOnly) {
+            const manifest = JSON.parse(plugin.manifest);
+            reloadPlugin({exports: {}, manifest}, undefined, true);
+        } else {
+            const module = {
+                exports: {},
+                manifest: JSON.parse(plugin.manifest),
+            };
+
+            // Wrap plugin source in an IIFE to ensure proper scoping
+            const wrappedSource = `(function(module, exports) { ${plugin.source} })(module, module.exports);`;
+
+            new Function("module", "exports", wrappedSource)(module, module.exports);
+
+            const {start, stop, ...otherExports} = module.exports;
+            if (start && stop) {
+                reloadPlugin(module, {start, stop}, false);
+            } else {
+                reloadPlugin(module, otherExports, false);
+            }
+        }
+    } catch (error) {
+        coreLogger.error(`Failed to process plugin ${pluginPath}:`, error);
+    }
+});
+
+window.gluonzaNative.listeners.addListener("pluginAdd", async (pluginPath: string) => {
+    coreLogger.info(`Plugin ${pluginPath} has been added`);
 
     try {
         const pluginName = pluginPath.split('/').pop();

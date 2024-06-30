@@ -6,12 +6,13 @@ import {loadPlugins, startCoreMods, startPlugins} from "./api/systems/plugins.js
 import {loadThemes, startThemes} from "./api/systems/themes.js";
 
 window.gluonza = gluonza;
+    
 whenWebpackReady().then(r => {
     // @ts-ignore
+    startCoreMods()
     loadPlugins(window.gluonzaNative.plugins.getNativePlugins().plugins)
     // @ts-ignore
     loadThemes(window.gluonzaNative.plugins.getNativeThemes().themes)
     startThemes();
-    startCoreMods();
     startPlugins();
 })
